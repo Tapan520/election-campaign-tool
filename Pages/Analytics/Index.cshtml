@@ -1,0 +1,226 @@
+@page
+@model ElectionCampaignTool.Pages.Analytics.IndexModel
+@{
+    ViewData["Title"] = "Analytics";
+}
+
+@{
+    var hasConstituencyChoice = Model.Constituencies.Any();
+    var hasWards = Model.Wards.Any();
+    var hasBooth = Model.Booths.Any();
+    var showFilters = hasConstituencyChoice || hasWards;
+}
+
+@if (showFilters)
+{
+    <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-3" id="analyticsFilterForm">
+        @if (hasConstituencyChoice)
+        {
+            <label class="fw-semibold text-nowrap"><i class="bi bi-geo-alt me-1"></i>Constituency:</label>
+            <select name="SelectedConstituencyId" id="selConstituency" class="form-select form-select-sm" style="max-width:220px">
+                <option value="">-- All Constituencies --</option>
+                @foreach (var c in Model.Constituencies)
+                {
+                    <option value="@c.Id" selected="@(Model.SelectedConstituencyId == c.Id)">@c.Name</option>
+                }
+            </select>
+        }
+        @if (hasWards)
+        {
+            <label class="fw-semibold text-nowrap"><i class="bi bi-map me-1"></i>Ward:</label>
+            <select name="SelectedWard" id="selWard" class="form-select form-select-sm" style="max-width:200px">
+                <option value="">-- All Wards --</option>
+                @foreach (var w in Model.Wards)
+                {
+                    <option value="@w.WardNumber" selected="@(Model.SelectedWard == w.WardNumber)">@w.WardName</option>
+                }
+            </select>
+        }
+        @if (hasBooth)
+        {
+            <label class="fw-semibold text-nowrap"><i class="bi bi-grid me-1"></i>Booth:</label>
+            <select name="SelectedBoothNumber" id="selBooth" class="form-select form-select-sm" style="max-width:190px">
+                <option value="">-- All Booths --</option>
+                @foreach (var b in Model.Booths)
+                {
+                    <option value="@b.BoothNumber" selected="@(Model.SelectedBoothNumber == b.BoothNumber)">@b.BoothName</option>
+                }
+            </select>
+        }
+        <button type="submit" class="btn btn-sm btn-primary"><i class="bi bi-funnel me-1"></i>Apply</button>
+        @if (Model.SelectedConstituencyId.HasValue || !string.IsNullOrEmpty(Model.SelectedWard) || Model.SelectedBoothNumber.HasValue)
+        {
+            <a href="?" class="btn btn-sm btn-outline-secondary">Clear</a>
+        }
+    </form>
+}
+else if (Model.SelectedConstituency != null)
+{
+    <div class="alert alert-info py-2 mb-3 d-flex flex-wrap align-items-center gap-3">
+        <span><i class="bi bi-geo-alt me-1"></i><strong>Constituency:</strong> @Model.SelectedConstituency.Name</span>
+        @if (hasWards)
+        {
+            <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-0">
+                <label class="fw-semibold text-nowrap small"><i class="bi bi-map me-1"></i>Ward:</label>
+                <select name="SelectedWard" id="selWard" class="form-select form-select-sm" style="max-width:200px">
+                    <option value="">-- All Wards --</option>
+                    @foreach (var w in Model.Wards)
+                    {
+                        <option value="@w.WardNumber" selected="@(Model.SelectedWard == w.WardNumber)">@w.WardName</option>
+                    }
+                </select>
+                @if (hasBooth)
+                {
+                    <label class="fw-semibold text-nowrap small"><i class="bi bi-grid me-1"></i>Booth:</label>
+                    <select name="SelectedBoothNumber" id="selBooth" class="form-select form-select-sm" style="max-width:190px">
+                        <option value="">-- All Booths --</option>
+                        @foreach (var b in Model.Booths)
+                        {
+                            <option value="@b.BoothNumber" selected="@(Model.SelectedBoothNumber == b.BoothNumber)">@b.BoothName</option>
+                        }
+                    </select>
+                }
+                <button type="submit" class="btn btn-sm btn-primary btn-sm"><i class="bi bi-funnel me-1"></i>Apply</button>
+                @if (!string.IsNullOrEmpty(Model.SelectedWard) || Model.SelectedBoothNumber.HasValue)
+                {
+                    <a href="?" class="btn btn-sm btn-outline-secondary">Clear</a>
+                }
+            </form>
+        }
+    </div>
+}
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pie-chart me-2 text-primary"></i>Sentiment Distribution</div>
+            <div class="card-body">
+                <div class="chart-container"><canvas id="sentimentChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-bar-chart me-2 text-warning"></i>Age-wise Voter Count</div>
+            <div class="card-body">
+                <div class="chart-container"><canvas id="ageChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-gender-ambiguous me-2 text-info"></i>Gender Breakdown</div>
+            <div class="card-body">
+                <div class="chart-container" style="height:200px"><canvas id="genderChart"></canvas></div>
+                <div class="row text-center mt-3">
+                    <div class="col-4">
+                        <div class="fw-bold text-primary fs-5">@Model.MaleVoters</div>
+                        <div class="small text-muted">Male</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-danger fs-5">@Model.FemaleVoters</div>
+                        <div class="small text-muted">Female</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-secondary fs-5">@Model.OtherVoters</div>
+                        <div class="small text-muted">Other</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-geo-alt me-2 text-success"></i>Booth-wise Sentiment (Favour)</div>
+            <div class="card-body">
+                <div class="chart-container" style="height:240px"><canvas id="boothChart"></canvas></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card">
+    <div class="card-header"><i class="bi bi-table me-2"></i>Booth-wise Summary</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr><th>Booth</th><th>Total</th><th>Favour</th><th>Against</th><th>Neutral</th><th>Unknown</th><th>Coverage %</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var row in Model.BoothAnalytics)
+                {
+                    var coverage = row.Total > 0 ? (row.Total - row.Unknown) * 100 / row.Total : 0;
+                    <tr>
+                        <td><span class="badge bg-secondary">#@row.BoothNumber</span></td>
+                        <td>@row.Total</td>
+                        <td><span class="badge badge-favour">@row.Favour</span></td>
+                        <td><span class="badge badge-against">@row.Against</span></td>
+                        <td><span class="badge badge-neutral">@row.Neutral</span></td>
+                        <td><span class="badge badge-unknown">@row.Unknown</span></td>
+                        <td>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="turnout-bar flex-grow-1">
+                                    <div class="turnout-bar-fill" style="width:@coverage%"></div>
+                                </div>
+                                <span class="small">@coverage%</span>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Sentiment Doughnut
+    new Chart(document.getElementById('sentimentChart').getContext('2d'), {
+        type: 'doughnut',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SentimentLabels)),
+            datasets: [{ data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SentimentValues)),
+                backgroundColor: ['#51cf66','#ff6b6b','#74c0fc','#ffd43b','#adb5bd'], borderWidth: 0 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'right' } } }
+    });
+    // Age Bar
+    new Chart(document.getElementById('ageChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AgeLabels)),
+            datasets: [{ label: 'Voters', data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.AgeValues)),
+                backgroundColor: '#4dabf7', borderRadius: 4 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+    });
+    // Gender Pie
+    new Chart(document.getElementById('genderChart').getContext('2d'), {
+        type: 'pie',
+        data: {
+            labels: ['Male', 'Female', 'Other'],
+            datasets: [{ data: [@Model.MaleVoters, @Model.FemaleVoters, @Model.OtherVoters],
+                backgroundColor: ['#4dabf7','#f783ac','#a9e34b'], borderWidth: 0 }]
+        },
+        options: { responsive: true, maintainAspectRatio: false }
+    });
+    // Booth Bar (favour)
+    new Chart(document.getElementById('boothChart').getContext('2d'), {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BoothAnalytics.Select(b => "Booth " + b.BoothNumber))),
+            datasets: [
+                { label: 'Favour', data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BoothAnalytics.Select(b => b.Favour))), backgroundColor: '#51cf66', borderRadius: 4 },
+                { label: 'Against', data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.BoothAnalytics.Select(b => b.Against))), backgroundColor: '#ff6b6b', borderRadius: 4 }
+            ]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } } }
+    });
+</script>
+}

@@ -1,0 +1,134 @@
+# ============================================================
+#  Election Campaign Tool — .gitignore
+# ============================================================
+
+# ?? .NET / ASP.NET Core ??????????????????????????????????????
+bin/
+obj/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vs/
+*.swp
+*.bak
+*.tmp
+*.log
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+[Xx]64/
+[Xx]86/
+[Ww][Ii][Nn]32/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+dist/
+publish/
+publish_out/
+**/publish_out/
+
+# Visual Studio
+.vs/
+*.rsuser
+*.vsp
+*.vspx
+*.sap
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp_proj
+*_wpftmp.csproj
+*.vspscc
+*.vssscc
+
+# .NET Core / Publish
+publish/
+**/Properties/launchSettings.json
+
+# NuGet
+*.nupkg
+*.snupkg
+**/[Pp]ackages/
+!**/[Pp]ackages/build/
+*.nuget.props
+*.nuget.targets
+nuget.config
+
+# User secrets & sensitive config
+appsettings.Production.json
+appsettings.Staging.json
+secrets.json
+.env
+.env.local
+.env.*.local
+
+# SQLite database files
+*.db
+*.db-shm
+*.db-wal
+election.db
+
+# Coverage / test results
+TestResults/
+coverage/
+*.coverage
+*.coveragexml
+*.trx
+
+# ?? Node.js / React Native / Expo ????????????????????????????
+mobile/node_modules/
+mobile/.expo/
+mobile/.expo-shared/
+mobile/dist/
+mobile/web-build/
+mobile/.env
+mobile/.env.local
+mobile/.env.development.local
+mobile/.env.test.local
+mobile/.env.production.local
+mobile/npm-debug.log*
+mobile/yarn-debug.log*
+mobile/yarn-error.log*
+
+# Expo native builds
+mobile/android/
+mobile/ios/
+mobile/*.jks
+mobile/*.keystore
+mobile/*.p8
+mobile/*.p12
+mobile/*.cer
+mobile/*.mobileprovision
+
+# ?? OS specific ???????????????????????????????????????????????
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+desktop.ini
+
+# ?? IDE / Editor ??????????????????????????????????????????????
+.idea/
+.vscode/settings.json
+.vscode/launch.json
+*.code-workspace

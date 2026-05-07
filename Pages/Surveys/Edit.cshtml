@@ -1,0 +1,55 @@
+@page "{id:int}"
+@model ElectionCampaignTool.Pages.Surveys.EditModel
+@{
+    ViewData["Title"] = "Edit Survey";
+}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pencil-square me-2"></i>Edit Survey</div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" asp-for="Survey.Id" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+                    <div class="row g-3">
+                        @if (Model.IsAdmin)
+                        {
+                            <div class="col-12">
+                                <label for="SelectedConstituencyId" class="form-label fw-semibold">Constituency *</label>
+                                <select id="SelectedConstituencyId" name="SelectedConstituencyId" class="form-select">
+                                    @foreach (var c in Model.Constituencies)
+                                    {
+                                        <option value="@c.Id" selected="@(Model.SelectedConstituencyId == c.Id)">@c.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                        <div class="col-12">
+                            <label asp-for="Survey.Title" class="form-label fw-semibold">Survey Title *</label>
+                            <input asp-for="Survey.Title" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Survey.Description" class="form-label fw-semibold">Description</label>
+                            <textarea asp-for="Survey.Description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Survey.Category" class="form-label fw-semibold">Category *</label>
+                            <select asp-for="Survey.Category" class="form-select"
+                                asp-items="Html.GetEnumSelectList<SurveyCategory>()"></select>
+                        </div>
+                        <div class="col-md-6 d-flex align-items-end">
+                            <div class="form-check mb-2">
+                                <input asp-for="Survey.IsActive" class="form-check-input" />
+                                <label asp-for="Survey.IsActive" class="form-check-label fw-semibold">Active (accepting responses)</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Changes</button>
+                        <a asp-page="/Surveys/Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,70 @@
+@page "{id:int}"
+@model ElectionCampaignTool.Pages.Admin.Constituencies.EditModel
+@{
+    ViewData["Title"] = "Edit Constituency";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pencil me-2"></i>Edit Constituency</div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" asp-for="ConstituencyId" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+                    <div class="row g-3">
+                        <div class="col-md-8">
+                            <label asp-for="Input.Name" class="form-label fw-semibold">Constituency Name *</label>
+                            <input asp-for="Input.Name" class="form-control" />
+                            <span asp-validation-for="Input.Name" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Input.Code" class="form-label fw-semibold">Code *</label>
+                            <input asp-for="Input.Code" class="form-control" />
+                            <span asp-validation-for="Input.Code" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Input.ElectionType" class="form-label fw-semibold">Election Type *</label>
+                            <select asp-for="Input.ElectionType" asp-items="Html.GetEnumSelectList<ElectionType>()" class="form-select"></select>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Input.State" class="form-label fw-semibold">State *</label>
+                            <input asp-for="Input.State" class="form-control" />
+                            <span asp-validation-for="Input.State" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Input.District" class="form-label fw-semibold">District *</label>
+                            <input asp-for="Input.District" class="form-control" />
+                            <span asp-validation-for="Input.District" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Input.CandidateName" class="form-label fw-semibold">Candidate Name</label>
+                            <input asp-for="Input.CandidateName" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Input.PartyName" class="form-label fw-semibold">Party Name</label>
+                            <input asp-for="Input.PartyName" class="form-control" />
+                        </div>
+                        <div class="col-md-2">
+                            <label asp-for="Input.PartySymbol" class="form-label fw-semibold">Symbol</label>
+                            <input asp-for="Input.PartySymbol" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Input.ElectionDate" class="form-label fw-semibold">Election Date *</label>
+                            <input asp-for="Input.ElectionDate" type="date" class="form-control" />
+                            <span asp-validation-for="Input.ElectionDate" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Update</button>
+                        <a asp-page="/Admin/Constituencies/Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

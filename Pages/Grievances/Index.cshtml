@@ -1,0 +1,119 @@
+@page
+@model ElectionCampaignTool.Pages.Grievances.IndexModel
+@{
+    ViewData["Title"] = "Grievances";
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-auto-dismiss">@TempData["Message"]</div>
+}
+
+@if (Model.Constituencies.Any() || Model.Wards.Any())
+{
+    <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-3">
+        @if (Model.Constituencies.Any())
+        {
+            <label class="fw-semibold text-nowrap"><i class="bi bi-geo-alt me-1"></i>Constituency:</label>
+            <select name="SelectedConstituencyId" class="form-select form-select-sm" style="max-width:220px" onchange="this.form.submit()">
+                <option value="">-- All Constituencies --</option>
+                @foreach (var c in Model.Constituencies)
+                {
+                    <option value="@c.Id" selected="@(Model.SelectedConstituencyId == c.Id)">@c.Name</option>
+                }
+            </select>
+        }
+        @if (Model.Wards.Any())
+        {
+            <label class="fw-semibold text-nowrap"><i class="bi bi-map me-1"></i>Ward:</label>
+            <select name="SelectedWard" class="form-select form-select-sm" style="max-width:200px" onchange="this.form.submit()">
+                <option value="">-- All Wards --</option>
+                @foreach (var w in Model.Wards)
+                {
+                    <option value="@w.WardNumber" selected="@(Model.SelectedWard == w.WardNumber)">@w.WardName</option>
+                }
+            </select>
+            <input type="hidden" name="SelectedConstituencyId" value="@Model.SelectedConstituencyId" />
+        }
+        @if (Model.Booths.Any())
+        {
+            <label class="fw-semibold text-nowrap"><i class="bi bi-grid me-1"></i>Booth:</label>
+            <select name="SelectedBoothNumber" class="form-select form-select-sm" style="max-width:190px" onchange="this.form.submit()">
+                <option value="">-- All Booths --</option>
+                @foreach (var b in Model.Booths)
+                {
+                    <option value="@b.BoothNumber" selected="@(Model.SelectedBoothNumber == b.BoothNumber)">@b.BoothName</option>
+                }
+            </select>
+            <input type="hidden" name="SelectedWard" value="@Model.SelectedWard" />
+        }
+        @if (Model.SelectedConstituencyId.HasValue || !string.IsNullOrEmpty(Model.SelectedWard) || Model.SelectedBoothNumber.HasValue)
+        {
+            <a href="?" class="btn btn-sm btn-outline-secondary">Clear</a>
+        }
+    </form>
+}
+
+<div class="d-flex justify-content-between mb-3">
+    <div class="d-flex gap-2">
+        <span class="badge bg-danger fs-6">@Model.OpenCount Open</span>
+        <span class="badge bg-warning text-dark fs-6">@Model.InProgressCount In Progress</span>
+        <span class="badge bg-success fs-6">@Model.ResolvedCount Resolved</span>
+    </div>
+    <a asp-page="/Grievances/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Grievance</a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr><th>#</th><th>Title</th><th>Reporter</th><th>Priority</th><th>Status</th><th>Constituency</th><th>Ward</th><th>Booth</th><th>Date</th><th></th></tr>
+                </thead>
+                <tbody>
+                @foreach (var g in Model.Grievances)
+                {
+                    <tr>
+                        <td class="text-muted small">@g.Id</td>
+                        <td>
+                            <div class="fw-semibold">@g.Title</div>
+                            <small class="text-muted">@((g.Description ?? string.Empty).Substring(0, Math.Min(60, (g.Description ?? string.Empty).Length)))@((g.Description ?? string.Empty).Length > 60 ? "..." : "")</small>
+                        </td>
+                        <td>
+                            <div>@(g.ReportedBy ?? "Anonymous")</div>
+                            @if (!string.IsNullOrEmpty(g.ReporterPhone)) { <small class="text-muted">@g.ReporterPhone</small> }
+                        </td>
+                        <td>
+                            <span class="badge @(g.Priority == GrievancePriority.Critical ? "bg-danger" :
+                                g.Priority == GrievancePriority.High ? "bg-warning text-dark" :
+                                g.Priority == GrievancePriority.Medium ? "bg-info text-dark" : "bg-secondary")">
+                                @g.Priority
+                            </span>
+                        </td>
+                        <td>
+                            <span class="badge @(g.Status == GrievanceStatus.Open ? "bg-danger" :
+                                g.Status == GrievanceStatus.InProgress ? "bg-warning text-dark" :
+                                g.Status == GrievanceStatus.Resolved ? "bg-success" : "bg-secondary")">
+                                @g.Status
+                            </span>
+                        </td>
+                        <td>@(g.Constituency?.Name ?? "—")</td>
+                        <td>@(g.Ward ?? "—")</td>
+                        <td>@(g.BoothNumber.HasValue ? $"#{g.BoothNumber}" : "—")</td>
+                        <td class="small">@g.ReportedAt.ToString("dd MMM yy")</td>
+                        <td>
+                            <a asp-page="/Grievances/Details" asp-route-id="@g.Id" class="btn btn-sm btn-outline-primary py-0">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Grievances.Any())
+                {
+                    <tr><td colspan="10" class="text-center text-muted py-4">No grievances recorded.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

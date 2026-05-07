@@ -1,0 +1,68 @@
+@page "{id:int}"
+@model ElectionCampaignTool.Pages.Grievances.DetailsModel
+@{
+    ViewData["Title"] = "Grievance Details";
+}
+
+@if (Model.Grievance == null) { <div class="alert alert-warning">Not found.</div> return; }
+
+<div class="row g-3">
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header d-flex justify-content-between">
+                <span><i class="bi bi-exclamation-triangle me-2"></i>@Model.Grievance.Title</span>
+                <span class="badge @(Model.Grievance.Priority == GrievancePriority.Critical ? "bg-danger" : "bg-warning text-dark")">@Model.Grievance.Priority</span>
+            </div>
+            <div class="card-body">
+                <p>@Model.Grievance.Description</p>
+                <div class="row g-2 small">
+                    <div class="col-6"><strong>Reported By:</strong> @(Model.Grievance.ReportedBy ?? "Anonymous")</div>
+                    <div class="col-6"><strong>Phone:</strong> @(Model.Grievance.ReporterPhone ?? "—")</div>
+                    <div class="col-6"><strong>Location:</strong> @(Model.Grievance.Location ?? "—")</div>
+                    <div class="col-6"><strong>Ward:</strong> @(Model.Grievance.Ward ?? "—")</div>
+                    <div class="col-6"><strong>Date:</strong> @Model.Grievance.ReportedAt.ToString("dd MMM yyyy")</div>
+                    <div class="col-6"><strong>Assigned To:</strong> @(Model.Grievance.AssignedToName ?? "Unassigned")</div>
+                </div>
+            </div>
+        </div>
+        @if (!string.IsNullOrEmpty(Model.Grievance.ResolutionNotes))
+        {
+            <div class="card border-success">
+                <div class="card-header text-success"><i class="bi bi-check-circle me-2"></i>Resolution Notes</div>
+                <div class="card-body">@Model.Grievance.ResolutionNotes</div>
+            </div>
+        }
+    </div>
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">Update Status</div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" name="id" value="@Model.Grievance.Id" />
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Status</label>
+                        <select name="status" class="form-select">
+                            @foreach (var s in Enum.GetValues<GrievanceStatus>())
+                            {
+                                if (Model.Grievance.Status == s)
+                                {
+                                    <option value="@s" selected>@s</option>
+                                }
+                                else
+                                {
+                                    <option value="@s">@s</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Resolution Notes</label>
+                        <textarea name="notes" class="form-control" rows="3">@Model.Grievance.ResolutionNotes</textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Update</button>
+                    <a asp-page="/Grievances/Index" class="btn btn-outline-secondary w-100 mt-2">Back</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

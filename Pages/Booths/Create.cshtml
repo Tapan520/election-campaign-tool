@@ -1,0 +1,60 @@
+@page
+@model ElectionCampaignTool.Pages.Booths.CreateModel
+@{
+    ViewData["Title"] = "Add Booth";
+}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-geo-alt me-2"></i>Add New Booth</div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+                    <div class="row g-3">
+                        @if (Model.IsAdmin)
+                        {
+                            <div class="col-12">
+                                <label asp-for="Booth.ConstituencyId" class="form-label fw-semibold">Constituency *</label>
+                                <select asp-for="Booth.ConstituencyId" class="form-select">
+                                    <option value="">-- Select Constituency --</option>
+                                    @foreach (var c in Model.Constituencies)
+                                    {
+                                        <option value="@c.Id">@c.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                        <div class="col-6">
+                            <label asp-for="Booth.BoothNumber" class="form-label fw-semibold">Booth Number *</label>
+                            <input asp-for="Booth.BoothNumber" class="form-control" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Booth.WardNumber" class="form-label fw-semibold">Ward Number</label>
+                            <input asp-for="Booth.WardNumber" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Booth.BoothName" class="form-label fw-semibold">Booth Name *</label>
+                            <input asp-for="Booth.BoothName" class="form-control" placeholder="e.g. Primary School Booth 3" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Booth.Address" class="form-label fw-semibold">Address *</label>
+                            <input asp-for="Booth.Address" class="form-control" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Booth.AssignedAgentName" class="form-label fw-semibold">Booth Agent Name</label>
+                            <input asp-for="Booth.AssignedAgentName" class="form-control" />
+                        </div>
+                        <div class="col-6">
+                            <label asp-for="Booth.AssignedAgentPhone" class="form-label fw-semibold">Agent Phone</label>
+                            <input asp-for="Booth.AssignedAgentPhone" class="form-control" />
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Booth</button>
+                        <a asp-page="/Booths/Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,83 @@
+@page
+@model ElectionCampaignTool.Pages.Admin.Wards.IndexModel
+@{
+    ViewData["Title"] = "Wards Management";
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-auto-dismiss"><i class="bi bi-check-circle me-2"></i>@TempData["Message"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    @if (User.IsInRole("Admin"))
+    {
+        <form method="get" class="d-flex gap-2">
+            <select name="ConstituencyId" class="form-select form-select-sm" style="min-width:220px;"
+                    onchange="this.form.submit()">
+                <option value="">-- All Constituencies --</option>
+                @foreach (var item in Model.ConstituencyItems)
+                {
+                    if (item.Value == Model.ConstituencyId?.ToString())
+                    {
+                        <option value="@item.Value" selected>@item.Text</option>
+                    }
+                    else
+                    {
+                        <option value="@item.Value">@item.Text</option>
+                    }
+                }
+            </select>
+        </form>
+    }
+    else
+    {
+        <span class="fw-semibold">@Model.SelectedConstituencyName</span>
+    }
+    <a asp-page="/Admin/Wards/Create" asp-route-constituencyId="@Model.ConstituencyId" class="btn btn-primary btn-sm">
+        <i class="bi bi-plus-circle me-1"></i>Add Ward
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr><th>Ward No.</th><th>Ward Name</th><th>Constituency</th><th>Description</th><th>Created</th><th></th></tr>
+                </thead>
+                <tbody>
+                @foreach (var w in Model.Wards)
+                {
+                    <tr>
+                        <td><span class="badge bg-secondary">@w.WardNumber</span></td>
+                        <td class="fw-semibold">@w.WardName</td>
+                        <td class="small text-muted">@w.Constituency?.Name</td>
+                        <td class="small">@(w.Description ?? "—")</td>
+                        <td class="small text-muted">@w.CreatedAt.ToString("dd MMM yyyy")</td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a asp-page="/Admin/Wards/Edit" asp-route-id="@w.Id"
+                                   class="btn btn-sm btn-outline-primary py-0 px-2" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" asp-page-handler="Delete" asp-route-id="@w.Id"
+                                      onsubmit="return confirm('Delete ward \'@w.WardName\'?');">
+                                    <input type="hidden" name="ConstituencyId" value="@Model.ConstituencyId" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Wards.Any())
+                {
+                    <tr><td colspan="6" class="text-center text-muted py-4">No wards found. <a asp-page="/Admin/Wards/Create">Add the first ward.</a></td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

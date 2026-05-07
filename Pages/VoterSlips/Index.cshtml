@@ -1,0 +1,184 @@
+@page
+@model ElectionCampaignTool.Pages.VoterSlips.IndexModel
+@{
+    ViewData["Title"] = "Voter Slips";
+    var filterLabel = Model.BoothFilter.HasValue ? $"Booth {Model.BoothFilter}" :
+                      Model.ConstituencyFilter.HasValue ? "Selected Constituency" : "All";
+}
+
+@* ?? Toolbar (hidden on print) ????????????????????????????????????????????? *@
+<div class="no-print">
+    <div class="row align-items-end g-2 mb-3">
+        <div class="col-auto">
+            <form method="get" class="d-flex flex-wrap gap-2 align-items-end">
+                @if (Model.IsAdmin)
+                {
+                    <div>
+                        <label class="form-label form-label-sm mb-1 fw-semibold">Constituency</label>
+                        <select asp-for="ConstituencyFilter" class="form-select form-select-sm" style="min-width:180px" onchange="this.form.submit()">
+                            <option value="">All Constituencies</option>
+                            @foreach (var c in Model.Constituencies)
+                            {
+                                <option value="@c.Id">@c.Name</option>
+                            }
+                        </select>
+                    </div>
+                }
+                <div>
+                    <label class="form-label form-label-sm mb-1 fw-semibold">Booth</label>
+                    <select asp-for="BoothFilter" class="form-select form-select-sm" style="min-width:130px">
+                        <option value="">All Booths</option>
+                        @foreach (var b in Model.BoothNumbers)
+                        {
+                            <option value="@b">Booth @b</option>
+                        }
+                    </select>
+                </div>
+                <div class="align-self-end">
+                    <button type="submit" class="btn btn-primary btn-sm">
+                        <i class="bi bi-funnel me-1"></i>Apply
+                    </button>
+                    @if (Model.BoothFilter.HasValue || Model.ConstituencyFilter.HasValue)
+                    {
+                        <a href="?" class="btn btn-outline-secondary btn-sm ms-1">Clear</a>
+                    }
+                </div>
+            </form>
+        </div>
+
+        @* Column-count toggle *@
+        <div class="col-auto ms-auto d-flex align-items-end gap-2">
+            <div>
+                <label class="form-label form-label-sm mb-1 fw-semibold">Columns</label>
+                <div class="btn-group btn-group-sm" role="group" id="colToggle">
+                    <button type="button" class="btn btn-outline-secondary" onclick="setColumns(2)" id="col2Btn">2</button>
+                    <button type="button" class="btn btn-primary active"    onclick="setColumns(3)" id="col3Btn">3</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="setColumns(4)" id="col4Btn">4</button>
+                </div>
+            </div>
+            <button onclick="window.print()" class="btn btn-success btn-sm">
+                <i class="bi bi-printer-fill me-1"></i>Print / PDF
+                <span class="badge bg-white text-success ms-1">@Model.Voters.Count</span>
+            </button>
+        </div>
+    </div>
+
+    @if (Model.Voters.Any())
+    {
+        <div class="alert alert-info py-2 mb-3 d-flex align-items-center gap-2">
+            <i class="bi bi-info-circle-fill"></i>
+            <span>Showing <strong>@Model.Voters.Count</strong> slip(s) — <strong>@filterLabel</strong>.
+            Use <strong>Print / PDF</strong> to print or save as PDF in
+            <strong><span id="colCountLabel">3</span>-column</strong> layout.</span>
+        </div>
+    }
+</div>
+
+@* ?? Print header (visible only on print) ????????????????????????????????? *@
+<div class="print-header" style="display:none">
+    <table style="width:100%; font-size:8pt;">
+        <tr>
+            <td style="font-weight:700; font-size:10pt;">Voter Slips — @filterLabel</td>
+            <td style="text-align:right; color:#555;">@DateTime.Now.ToString("dd MMM yyyy, hh:mm tt") &nbsp;|&nbsp; Total: @Model.Voters.Count</td>
+        </tr>
+    </table>
+</div>
+
+@* ?? Slip grid ????????????????????????????????????????????????????????????? *@
+<div class="row g-2" id="slipContainer">
+    @foreach (var v in Model.Voters)
+    {
+        <div class="col-4 slip-col" id="slipWrap_@v.Id">
+            <div class="voter-slip-card border rounded p-2">
+                <div class="d-flex gap-1 align-items-start">
+                    <div class="flex-grow-1 overflow-hidden">
+                        <div class="slip-name fw-bold text-truncate" style="font-size:0.78rem">@v.Name</div>
+                        @if (!string.IsNullOrEmpty(v.NameLocal))
+                        {
+                            <div class="slip-local text-truncate" style="font-size:0.75rem">@v.NameLocal</div>
+                        }
+                        <div class="text-muted small">S/O: @(v.FatherHusbandName ?? "—")</div>
+
+                        <div class="d-flex flex-wrap gap-x-2 mt-1" style="font-size:0.72rem; column-gap:0.6rem">
+                            <span><span class="slip-label fw-semibold">EPIC:</span> <span class="font-monospace">@v.VoterId</span></span>
+                        </div>
+                        <div class="d-flex flex-wrap gap-x-2" style="font-size:0.72rem; column-gap:0.6rem">
+                            <span><span class="slip-label fw-semibold">Booth:</span> @v.BoothNumber</span>
+                            <span><span class="slip-label fw-semibold">Sr:</span> @v.SerialNumber</span>
+                            <span><span class="slip-label fw-semibold">Ward:</span> @(v.WardNumber ?? "—")</span>
+                            <span><span class="slip-label fw-semibold">Panna:</span> @(v.PannaNumber ?? "—")</span>
+                        </div>
+                        <div class="slip-address text-muted text-truncate" style="font-size:0.65rem; margin-top:2px">@v.Address</div>
+                    </div>
+                    @if (!string.IsNullOrEmpty(Model.GetQrCode(v.Id)))
+                    {
+                        <img src="data:image/png;base64,@Model.GetQrCode(v.Id)"
+                             width="44" height="44" alt="QR"
+                             style="flex-shrink:0; border:1px solid #dee2e6; border-radius:3px" />
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.Voters.Any())
+    {
+        <div class="col-12 text-center text-muted py-5">
+            <i class="bi bi-inbox fs-1 d-block mb-2"></i>
+            No voters found. Import voters first or adjust the filters.
+        </div>
+    }
+</div>
+
+@* Dynamic print-column style — updated by setColumns() before window.print() *@
+<style id="printColStyle">
+    @@media print {
+        .slip-col {
+            width: 33.333% !important;
+            max-width: 33.333% !important;
+            flex: 0 0 33.333% !important;
+        }
+    }
+</style>
+
+@section Scripts {
+<script>
+    const colClasses = { 2: 'col-6', 3: 'col-4', 4: 'col-3' };
+    const colWidths  = { 2: '50%',   3: '33.333%', 4: '25%'  };
+    const colFontPt  = { 2: '8.5pt', 3: '7pt',     4: '6pt'  };
+    const AT = '\u0040'; // unicode for the at-sign, avoids Razor parsing
+
+    function buildPrintCss(w, f) {
+        return AT + 'media print {\n'
+             + '  .slip-col {\n'
+             + '    width: '     + w + ' !important;\n'
+             + '    max-width: ' + w + ' !important;\n'
+             + '    flex: 0 0 '  + w + ' !important;\n'
+             + '  }\n'
+             + '  .voter-slip-card { font-size: ' + f + ' !important; }\n'
+             + '}';
+    }
+
+    function setColumns(n) {
+        // 1. Update screen layout classes
+        document.querySelectorAll('#slipContainer .slip-col').forEach(el => {
+            el.className = el.className.replace(/\bcol-\d+\b/, colClasses[n]);
+        });
+
+        // 2. Rewrite the dynamic print style
+        document.getElementById('printColStyle').textContent =
+            buildPrintCss(colWidths[n], colFontPt[n]);
+
+        // 3. Toggle button active states
+        [2, 3, 4].forEach(i => {
+            const btn = document.getElementById('col' + i + 'Btn');
+            btn.classList.toggle('btn-primary',           i === n);
+            btn.classList.toggle('active',                i === n);
+            btn.classList.toggle('btn-outline-secondary', i !== n);
+        });
+
+        // 4. Reflect new column count in the info banner
+        const lbl = document.getElementById('colCountLabel');
+        if (lbl) lbl.textContent = n;
+    }
+</script>
+}

@@ -1,0 +1,88 @@
+@page "{id:int}"
+@model ElectionCampaignTool.Pages.Voters.EditModel
+@{
+    ViewData["Title"] = "Edit Voter";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pencil me-2"></i>Edit Voter — @Model.Voter?.VoterId</div>
+            <div class="card-body">
+                <form method="post">
+                    <input asp-for="Voter!.Id" type="hidden" />
+                    <input asp-for="Voter!.ConstituencyId" type="hidden" />
+                    <input asp-for="Voter!.ImportedAt" type="hidden" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label asp-for="Voter!.VoterId" class="form-label fw-semibold">EPIC No.</label>
+                            <input asp-for="Voter!.VoterId" class="form-control font-monospace" readonly />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Voter!.SerialNumber" class="form-label fw-semibold">Serial No.</label>
+                            <input asp-for="Voter!.SerialNumber" type="number" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Voter!.Name" class="form-label fw-semibold">Name *</label>
+                            <input asp-for="Voter!.Name" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Voter!.NameLocal" class="form-label fw-semibold">Name (Local Language)</label>
+                            <input asp-for="Voter!.NameLocal" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Voter!.FatherHusbandName" class="form-label fw-semibold">Father/Husband Name</label>
+                            <input asp-for="Voter!.FatherHusbandName" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="Voter!.Age" class="form-label fw-semibold">Age *</label>
+                            <input asp-for="Voter!.Age" type="number" class="form-control" />
+                        </div>
+                        <div class="col-md-3">
+                            <label asp-for="Voter!.Gender" class="form-label fw-semibold">Gender *</label>
+                            <select asp-for="Voter!.Gender" class="form-select">
+                                <option value="M">Male</option>
+                                <option value="F">Female</option>
+                                <option value="O">Other</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Voter!.MobileNumber" class="form-label fw-semibold">Mobile Number</label>
+                            <input asp-for="Voter!.MobileNumber" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Voter!.Sentiment" class="form-label fw-semibold">Sentiment</label>
+                            <select asp-for="Voter!.Sentiment" class="form-select"
+                                asp-items="Html.GetEnumSelectList<VoterSentiment>()"></select>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Voter!.Address" class="form-label fw-semibold">Address *</label>
+                            <input asp-for="Voter!.Address" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Voter!.BoothNumber" class="form-label fw-semibold">Booth No. *</label>
+                            <input asp-for="Voter!.BoothNumber" type="number" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Voter!.WardNumber" class="form-label fw-semibold">Ward No.</label>
+                            <input asp-for="Voter!.WardNumber" class="form-control" />
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Voter!.PannaNumber" class="form-label fw-semibold">Panna No.</label>
+                            <input asp-for="Voter!.PannaNumber" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Voter!.Notes" class="form-label fw-semibold">Notes</label>
+                            <textarea asp-for="Voter!.Notes" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Update</button>
+                        <a asp-page="/Voters/Details" asp-route-id="@Model.Voter?.Id" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

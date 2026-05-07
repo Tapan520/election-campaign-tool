@@ -1,0 +1,97 @@
+@page
+@model ElectionCampaignTool.Pages.Expenses.IndexModel
+@{
+    ViewData["Title"] = "Expense Tracker";
+}
+
+<div class="row g-3 mb-3">
+    <div class="col-md-3">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="fs-4 fw-bold">?@Model.TotalAmount.ToString("N0")</div>
+                <div class="small text-muted">Total Expenses</div>
+            </div>
+        </div>
+    </div>
+    @foreach (var cat in Model.CategoryTotals)
+    {
+        <div class="col-md-2">
+            <div class="card text-center">
+                <div class="card-body py-2">
+                    <div class="fw-bold">?@cat.Value.ToString("N0")</div>
+                    <div class="small text-muted">@cat.Key</div>
+                </div>
+            </div>
+        </div>
+    }
+</div>
+
+<div class="d-flex justify-content-between mb-3">
+@if (Model.Constituencies.Any())
+{
+    <form method="get" class="d-flex align-items-center gap-2">
+        <label class="fw-semibold text-nowrap"><i class="bi bi-geo-alt me-1"></i>Constituency:</label>
+        <select name="SelectedConstituencyId" class="form-select form-select-sm" style="max-width:240px" onchange="this.form.submit()">
+            <option value="">-- All Constituencies --</option>
+            @foreach (var c in Model.Constituencies)
+            {
+                <option value="@c.Id" selected="@(Model.SelectedConstituencyId == c.Id)">@c.Name</option>
+            }
+        </select>
+        @if (Model.SelectedConstituencyId.HasValue)
+        {
+            <a href="?SelectedConstituencyId=" class="btn btn-sm btn-outline-secondary">Clear</a>
+        }
+    </form>
+}
+else
+{
+    <div></div>
+}
+    <a asp-page="/Expenses/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>Add Expense</a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr><th>Date</th><th>Description</th><th>Category</th><th>Constituency</th><th>Payee</th><th>Amount</th><th>EC</th><th>Voucher</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var e in Model.Expenses)
+                {
+                    <tr>
+                        <td class="small">@e.ExpenseDate.ToString("dd MMM yy")</td>
+                        <td>@e.Description</td>
+                        <td><span class="badge bg-info text-dark">@e.Category</span></td>
+                        <td>@(e.Constituency?.Name ?? "—")</td>
+                        <td>@(e.PayeeName ?? "—")</td>
+                        <td class="fw-bold">?@e.Amount.ToString("N0")</td>
+                        <td>
+                            <span class="badge @(e.IsECCompliant ? "bg-success" : "bg-danger")">
+                                @(e.IsECCompliant ? "?" : "?")
+                            </span>
+                        </td>
+                        <td class="small font-monospace">@(e.VoucherNumber ?? "—")</td>
+                    </tr>
+                }
+                @if (!Model.Expenses.Any())
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-4">No expenses recorded.</td></tr>
+                }
+                </tbody>
+                @if (Model.Expenses.Any())
+                {
+                    <tfoot class="table-light">
+                        <tr>
+                            <td colspan="5" class="fw-bold text-end">Total:</td>
+                            <td class="fw-bold">?@Model.TotalAmount.ToString("N0")</td>
+                            <td colspan="2"></td>
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+        </div>
+    </div>
+</div>

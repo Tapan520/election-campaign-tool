@@ -1,0 +1,77 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using ElectionCampaignTool.Domain.Entities;
+using ElectionCampaignTool.Domain.Enums;
+using ElectionCampaignTool.Infrastructure.Data;
+
+namespace ElectionCampaignTool.Pages.Campaign;
+
+public class IndexModel : PageModel
+{
+    private static readonly UserRole[] ManageRoles = [UserRole.Admin, UserRole.CampaignManager, UserRole.Candidate];
+    private readonly AppDbContext _db;
+    private readonly UserManager<AppUser> _userManager;
+
+    public IndexModel(AppDbContext db, UserManager<AppUser> userManager)
+    {
+        _db = db;
+        _userManager = userManager;
+    }
+
+    public List<CampaignEvent> Events { get; set; } = new();
+    public List<Constituency> Constituencies { get; set; } = new();
+    public bool IsAdmin { get; set; }
+    public bool CanManage { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public int? ConstituencyFilter { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        IsAdmin = user?.Role == UserRole.Admin;
+        CanManage = user != null && ManageRoles.Contains(user.Role);
+        if (IsAdmin)
+            Constituencies = await _db.Constituencies.OrderBy(c => c.Name).ToListAsync();
+
+        IQueryable<CampaignEvent> query = _db.CampaignEvents.OrderByDescending(e => e.ScheduledAt);
+        if (IsAdmin)
+        {
+            if (ConstituencyFilter.HasValue)
+                query = query.Where(e => e.ConstituencyId == ConstituencyFilter);
+        }
+        else if (user?.ConstituencyId.HasValue == true)
+            query = query.Where(e => e.ConstituencyId == user.ConstituencyId);
+        Events = await query.ToListAsync();
+    }
+
+    public async Task<IActionResult> OnPostCompleteAsync(int id)
+    {
+        var ev = await _db.CampaignEvents.FindAsync(id);
+        if (ev != null)
+        {
+            ev.IsCompleted = true;
+            await _db.SaveChangesAsync();
+            TempData["Message"] = "Event marked as completed.";
+        }
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null || !ManageRoles.Contains(user.Role)) return Forbid();
+        var ev = await _db.CampaignEvents.FindAsync(id);
+        if (ev != null)
+        {
+            if (user.Role != UserRole.Admin && ev.ConstituencyId != user.ConstituencyId)
+                return Forbid();
+            _db.CampaignEvents.Remove(ev);
+            await _db.SaveChangesAsync();
+            TempData["Message"] = $"Event '{ev.Title}' deleted.";
+        }
+        return RedirectToPage();
+    }
+}

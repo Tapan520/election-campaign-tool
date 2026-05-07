@@ -1,0 +1,284 @@
+/* ============================================
+   Election Campaign Tool - Main Stylesheet
+   ============================================ */
+
+:root {
+    --sidebar-width: 240px;
+    --sidebar-bg: #1a1f2e;
+    --sidebar-link-hover: #2d3452;
+    --sidebar-active: #3b5bdb;
+    --primary: #3b5bdb;
+    --success: #2f9e44;
+    --warning: #f59f00;
+    --danger: #e03131;
+}
+
+/* --- Sidebar --- */
+#sidebar {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    background: var(--sidebar-bg);
+    transition: width 0.25s ease;
+    flex-shrink: 0;
+}
+
+#sidebar.collapsed {
+    width: 60px;
+}
+
+#sidebar.collapsed .sidebar-link span,
+#sidebar.collapsed .sidebar-section-label,
+#sidebar.collapsed .sidebar-footer .small {
+    display: none;
+}
+
+.sidebar-link {
+    color: #adb5bd;
+    border-radius: 6px;
+    padding: 0.45rem 0.75rem;
+    font-size: 0.875rem;
+    transition: background 0.15s, color 0.15s;
+}
+
+.sidebar-link:hover {
+    background: var(--sidebar-link-hover);
+    color: #fff;
+}
+
+.sidebar-link.active {
+    background: var(--sidebar-active);
+    color: #fff;
+    font-weight: 600;
+}
+
+.sidebar-section-label {
+    font-size: 0.65rem;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #6c757d;
+    text-transform: uppercase;
+}
+
+/* --- Page content --- */
+#page-content-wrapper {
+    min-height: 100vh;
+    background: #f0f2f5;
+}
+
+/* --- Stat Cards --- */
+.stat-card {
+    border: none;
+    border-radius: 12px;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.stat-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+}
+
+.stat-icon {
+    width: 52px;
+    height: 52px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+}
+
+/* --- Tables --- */
+.table th {
+    font-size: 0.78rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6c757d;
+    border-top: none;
+}
+
+.table td {
+    font-size: 0.875rem;
+    vertical-align: middle;
+}
+
+/* --- Sentiment badges --- */
+.badge-favour { background: #d3f9d8; color: #2f9e44; }
+.badge-against { background: #ffe3e3; color: #e03131; }
+.badge-neutral { background: #e7f5ff; color: #1971c2; }
+.badge-floating { background: #fff3bf; color: #e67700; }
+.badge-unknown { background: #f1f3f5; color: #868e96; }
+
+/* --- Turnout bar --- */
+.turnout-bar {
+    height: 8px;
+    border-radius: 4px;
+    background: #e9ecef;
+    overflow: hidden;
+}
+
+.turnout-bar-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, #3b5bdb, #4dabf7);
+    transition: width 0.6s ease;
+}
+
+/* --- Cards --- */
+.card {
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+}
+
+.card-header {
+    background: transparent;
+    border-bottom: 1px solid #f1f3f5;
+    font-weight: 600;
+    font-size: 0.9rem;
+}
+
+/* --- Voter row sentiment highlight --- */
+.voter-favour { border-left: 3px solid var(--success); }
+.voter-against { border-left: 3px solid var(--danger); }
+.voter-neutral { border-left: 3px solid #4dabf7; }
+.voter-floating { border-left: 3px solid var(--warning); }
+
+/* --- Login page --- */
+.login-wrapper {
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a1f2e 0%, #2d3452 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 420px;
+    border-radius: 16px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+}
+
+/* --- Responsive --- */
+@media (max-width: 768px) {
+    #sidebar {
+        position: fixed;
+        z-index: 1000;
+        transform: translateX(-100%);
+    }
+    #sidebar.mobile-open {
+        transform: translateX(0);
+    }
+}
+
+/* --- Print voter slips --- */
+@media print {
+    /* ?? Hide all UI chrome ??????????????????????????????????????? */
+    #sidebar,
+    .navbar,
+    .no-print { display: none !important; }
+
+    #page-content-wrapper {
+        margin: 0 !important;
+        padding: 0 !important;
+        background: #fff !important;
+    }
+
+    body { margin: 0 !important; background: #fff !important; }
+
+    .container-fluid { padding: 0 !important; }
+
+    /* ?? Page setup (A4, tight margins) ??????????????????????????? */
+    @page {
+        size: A4 portrait;
+        margin: 8mm 7mm;
+    }
+
+    /* Column width for .slip-col is injected dynamically via <style id="printColStyle"> in the page.
+       Only the flex container is defined here. */
+    #slipContainer {
+        display: flex !important;
+        flex-wrap: wrap !important;
+        gap: 0 !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+    }
+
+    .slip-col {
+        padding: 1.5mm !important;
+        box-sizing: border-box !important;
+    }
+
+    /* ?? Individual slip ??????????????????????????????????????????? */
+    .voter-slip-card {
+        border: 0.4pt dashed #777 !important;
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        background: #fff !important;
+        padding: 2.5mm 3mm !important;
+        font-size: 7pt !important;
+        line-height: 1.35 !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
+        min-height: 30mm !important;
+        overflow: hidden !important;
+    }
+
+    .voter-slip-card .slip-name {
+        font-size: 8pt !important;
+        font-weight: 700 !important;
+    }
+
+    .voter-slip-card .slip-local {
+        font-size: 7.5pt !important;
+    }
+
+    .voter-slip-card .slip-label {
+        font-weight: 600 !important;
+    }
+
+    .voter-slip-card img {
+        width: 36px !important;
+        height: 36px !important;
+        flex-shrink: 0 !important;
+    }
+
+    .voter-slip-card .slip-address {
+        font-size: 6pt !important;
+        color: #444 !important;
+        margin-top: 1mm !important;
+    }
+
+    /* ?? Print header ?????????????????????????????????????????????? */
+    .print-header {
+        display: block !important;
+        border-bottom: 1pt solid #000 !important;
+        margin-bottom: 3mm !important;
+        padding-bottom: 2mm !important;
+        font-size: 8pt !important;
+    }
+}
+
+/* --- Chart container --- */
+.chart-container {
+    position: relative;
+    height: 280px;
+}
+
+/* --- Election day live indicator --- */
+.live-dot {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2f9e44;
+    animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% { box-shadow: 0 0 0 0 rgba(47,158,68,0.5); }
+    70% { box-shadow: 0 0 0 8px rgba(47,158,68,0); }
+    100% { box-shadow: 0 0 0 0 rgba(47,158,68,0); }
+}

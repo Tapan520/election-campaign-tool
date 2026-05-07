@@ -1,0 +1,62 @@
+@page
+@model ElectionCampaignTool.Pages.Admin.CreateUserModel
+@{
+    ViewData["Title"] = "Create User";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-person-plus me-2"></i>Create New User</div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="Input.FullName" class="form-label fw-semibold">Full Name *</label>
+                            <input asp-for="Input.FullName" class="form-control" />
+                            <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Input.Email" class="form-label fw-semibold">Email *</label>
+                            <input asp-for="Input.Email" class="form-control" />
+                            <span asp-validation-for="Input.Email" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Input.PhoneNumber" class="form-label fw-semibold">Phone</label>
+                            <input asp-for="Input.PhoneNumber" class="form-control" placeholder="10-digit mobile" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Input.Role" class="form-label fw-semibold">Role *</label>
+                            <select asp-for="Input.Role" asp-items="Model.RoleItems" class="form-select"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Input.ConstituencyId" class="form-label fw-semibold">Constituency</label>
+                            <select asp-for="Input.ConstituencyId" asp-items="Model.ConstituencyItems" class="form-select">
+                                <option value="">-- All --</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Input.AssignedBoothNumbers" class="form-label fw-semibold">Assigned Booths</label>
+                            <input asp-for="Input.AssignedBoothNumbers" class="form-control" placeholder="e.g. 1,2,3 (leave blank for all)" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Input.AssignedWard" class="form-label fw-semibold">Assigned Ward</label>
+                            <input asp-for="Input.AssignedWard" class="form-control" placeholder="Ward number" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Input.Password" class="form-label fw-semibold">Password *</label>
+                            <input asp-for="Input.Password" type="password" class="form-control" />
+                            <div class="form-text">Min 6 characters, 1 uppercase, 1 digit.</div>
+                            <span asp-validation-for="Input.Password" class="text-danger small"></span>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Create User</button>
+                        <a asp-page="/Admin/Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

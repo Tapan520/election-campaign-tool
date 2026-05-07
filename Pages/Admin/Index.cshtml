@@ -1,0 +1,110 @@
+@page
+@model ElectionCampaignTool.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "User Management";
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-auto-dismiss"><i class="bi bi-check-circle me-2"></i>@TempData["Message"]</div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="alert alert-danger alert-auto-dismiss"><i class="bi bi-x-circle me-2"></i>@TempData["Error"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-center mb-3">
+    <span class="text-muted small">@Model.Users.Count user(s)</span>
+    <a asp-page="/Admin/CreateUser" class="btn btn-primary btn-sm">
+        <i class="bi bi-person-plus me-1"></i>Create User
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr><th>Name</th><th>Email</th><th>Role</th><th>Constituency</th><th>Ward</th><th>Booths</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                @foreach (var u in Model.Users)
+                {
+                    <tr>
+                        <td class="fw-semibold">@u.FullName</td>
+                        <td class="small">@u.Email</td>
+                        <td>
+                            <span class="badge @(u.Role == UserRole.Admin ? "bg-danger" :
+                                u.Role == UserRole.CampaignManager ? "bg-primary" :
+                                u.Role == UserRole.Candidate ? "bg-warning text-dark" :
+                                u.Role == UserRole.BoothAgent ? "bg-info text-dark" : "bg-secondary")">
+                                @u.Role
+                            </span>
+                        </td>
+                        <td class="small">@(u.Constituency?.Name ?? "—")</td>
+                        <td class="small">@(u.AssignedWard ?? "—")</td>
+                        <td class="small">@(u.AssignedBoothNumbers ?? "All")</td>
+                        <td>
+                            <span class="badge @(u.IsActive ? "bg-success" : "bg-secondary")">
+                                @(u.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                                <a asp-page="/Admin/EditUser" asp-route-id="@u.Id"
+                                   class="btn btn-sm btn-outline-primary py-0 px-2" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" asp-page-handler="Toggle" class="d-inline">
+                                    <input type="hidden" name="userId" value="@u.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-@(u.IsActive ? "warning" : "success") py-0 px-2"
+                                            title="@(u.IsActive ? "Disable" : "Enable")">
+                                        <i class="bi bi-@(u.IsActive ? "pause" : "play")"></i>
+                                    </button>
+                                </form>
+                                @if (User.IsInRole("Admin"))
+                                {
+                                    <a asp-page="/Admin/DeleteUser" asp-route-id="@u.Id"
+                                       class="btn btn-sm btn-outline-danger py-0 px-2" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </a>
+                                }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Users.Any())
+                {
+                    <tr><td colspan="8" class="text-center text-muted py-4">No users found.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-4">
+    <div class="card-header"><i class="bi bi-clock-history me-2"></i>Recent Audit Logs</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-sm mb-0">
+                <thead><tr><th>Time</th><th>User</th><th>Action</th><th>Entity</th></tr></thead>
+                <tbody>
+                @foreach (var log in Model.AuditLogs)
+                {
+                    <tr>
+                        <td class="small text-muted">@log.CreatedAt.ToString("dd MMM HH:mm")</td>
+                        <td class="small">@log.UserName</td>
+                        <td class="small">@log.Action</td>
+                        <td class="small">@log.EntityType @log.EntityId</td>
+                    </tr>
+                }
+                @if (!Model.AuditLogs.Any())
+                {
+                    <tr><td colspan="4" class="text-center text-muted py-3 small">No audit logs yet.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

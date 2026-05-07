@@ -1,0 +1,92 @@
+@page
+@model ElectionCampaignTool.Pages.Booths.IndexModel
+@{
+    ViewData["Title"] = "Booth Management";
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-auto-dismiss">@TempData["Message"]</div>
+}
+
+<div class="d-flex justify-content-between mb-3">
+    <div class="d-flex align-items-center gap-3">
+        <span class="text-muted small">@Model.Booths.Count booths</span>
+        @if (Model.IsAdmin)
+        {
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <select name="constituencyFilter" class="form-select form-select-sm" onchange="this.form.submit()" style="width:200px">
+                    <option value="">All Constituencies</option>
+                    @foreach (var c in Model.Constituencies)
+                    {
+                        <option value="@c.Id" selected="@(Model.ConstituencyFilter == c.Id)">@c.Name</option>
+                    }
+                </select>
+            </form>
+        }
+    </div>
+    <a asp-page="/Booths/Create" class="btn btn-primary btn-sm"
+       style="@(!Model.CanManage ? "display:none" : "")"><i class="bi bi-plus-lg me-1"></i>Add Booth</a>
+</div>
+
+<div class="row g-3">
+@foreach (var b in Model.Booths)
+{
+    var pct = b.TotalVoters > 0 ? (int)Math.Round((double)b.VotedCount / b.TotalVoters * 100) : 0;
+    <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <div>
+                        <h6 class="mb-0 fw-bold"><span class="badge bg-primary me-1">#@b.BoothNumber</span> @b.BoothName</h6>
+                        <small class="text-muted">@b.Address</small>
+                    </div>
+                    @if (Model.CanManage)
+                    {
+                        <a asp-page="/Booths/Edit" asp-route-id="@b.Id" class="btn btn-sm btn-outline-secondary py-0">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                    }
+                </div>
+                <div class="row g-2 mb-2 text-center">
+                    <div class="col-4">
+                        <div class="fw-bold">@b.TotalVoters</div>
+                        <div class="text-muted" style="font-size:0.7rem">Total</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-primary">@b.MaleVoters</div>
+                        <div class="text-muted" style="font-size:0.7rem">Male</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="fw-bold text-danger">@b.FemaleVoters</div>
+                        <div class="text-muted" style="font-size:0.7rem">Female</div>
+                    </div>
+                </div>
+                <div class="mb-2">
+                    <div class="d-flex justify-content-between small mb-1">
+                        <span>Turnout</span><span>@b.VotedCount / @b.TotalVoters (@pct%)</span>
+                    </div>
+                    <div class="turnout-bar">
+                        <div class="turnout-bar-fill" style="width:@pct%"></div>
+                    </div>
+                </div>
+                <div class="small">
+                    <i class="bi bi-person-badge me-1 text-success"></i>
+                    @if (string.IsNullOrEmpty(b.AssignedAgentName))
+                    {
+                        <span class="text-muted">No agent assigned</span>
+                    }
+                    else
+                    {
+                        @($"{b.AssignedAgentName} ({b.AssignedAgentPhone})")
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (!Model.Booths.Any())
+{
+    <div class="col-12 text-center text-muted py-5">No booths found. Add a booth to get started.</div>
+}
+</div>

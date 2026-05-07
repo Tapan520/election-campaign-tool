@@ -1,0 +1,174 @@
+@page
+@model ElectionCampaignTool.Pages.Surveys.IndexModel
+@{
+    ViewData["Title"] = "Surveys & Feedback";
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-auto-dismiss">@TempData["Message"]</div>
+}
+
+<div class="d-flex justify-content-between align-items-start mb-3 flex-wrap gap-2">
+    @if (Model.IsAdmin && Model.Constituencies.Any())
+    {
+        <form method="get" class="d-flex flex-wrap align-items-center gap-2">
+            <label class="fw-semibold text-nowrap"><i class="bi bi-geo-alt me-1"></i>Constituency:</label>
+            <select name="SelectedConstituencyId" class="form-select form-select-sm" style="max-width:220px" onchange="this.form.submit()">
+                <option value="">-- All Constituencies --</option>
+                @foreach (var c in Model.Constituencies)
+                {
+                    <option value="@c.Id" selected="@(Model.SelectedConstituencyId == c.Id)">@c.Name</option>
+                }
+            </select>
+            @if (Model.Wards.Any())
+            {
+                <label class="fw-semibold text-nowrap"><i class="bi bi-map me-1"></i>Ward:</label>
+                <select name="SelectedWard" class="form-select form-select-sm" style="max-width:200px" onchange="this.form.submit()">
+                    <option value="">-- All Wards --</option>
+                    @foreach (var w in Model.Wards)
+                    {
+                        <option value="@w.WardNumber" selected="@(Model.SelectedWard == w.WardNumber)">@w.WardName</option>
+                    }
+                </select>
+                <input type="hidden" name="SelectedConstituencyId" value="@Model.SelectedConstituencyId" />
+            }
+            @if (Model.Booths.Any())
+            {
+                <label class="fw-semibold text-nowrap"><i class="bi bi-grid me-1"></i>Booth:</label>
+                <select name="SelectedBoothNumber" class="form-select form-select-sm" style="max-width:190px" onchange="this.form.submit()">
+                    <option value="">-- All Booths --</option>
+                    @foreach (var b in Model.Booths)
+                    {
+                        <option value="@b.BoothNumber" selected="@(Model.SelectedBoothNumber == b.BoothNumber)">@b.BoothName</option>
+                    }
+                </select>
+                <input type="hidden" name="SelectedWard" value="@Model.SelectedWard" />
+            }
+            @if (Model.SelectedConstituencyId.HasValue || !string.IsNullOrEmpty(Model.SelectedWard) || Model.SelectedBoothNumber.HasValue)
+            {
+                <a href="?" class="btn btn-sm btn-outline-secondary">Clear</a>
+            }
+        </form>
+    }
+    else if (Model.Wards.Any())
+    {
+        <form method="get" class="d-flex flex-wrap align-items-center gap-2">
+            <label class="fw-semibold text-nowrap"><i class="bi bi-map me-1"></i>Ward:</label>
+            <select name="SelectedWard" class="form-select form-select-sm" style="max-width:200px" onchange="this.form.submit()">
+                <option value="">-- All Wards --</option>
+                @foreach (var w in Model.Wards)
+                {
+                    <option value="@w.WardNumber" selected="@(Model.SelectedWard == w.WardNumber)">@w.WardName</option>
+                }
+            </select>
+            @if (Model.Booths.Any())
+            {
+                <label class="fw-semibold text-nowrap"><i class="bi bi-grid me-1"></i>Booth:</label>
+                <select name="SelectedBoothNumber" class="form-select form-select-sm" style="max-width:190px" onchange="this.form.submit()">
+                    <option value="">-- All Booths --</option>
+                    @foreach (var b in Model.Booths)
+                    {
+                        <option value="@b.BoothNumber" selected="@(Model.SelectedBoothNumber == b.BoothNumber)">@b.BoothName</option>
+                    }
+                </select>
+                <input type="hidden" name="SelectedWard" value="@Model.SelectedWard" />
+            }
+            @if (!string.IsNullOrEmpty(Model.SelectedWard) || Model.SelectedBoothNumber.HasValue)
+            {
+                <a href="?" class="btn btn-sm btn-outline-secondary">Clear</a>
+            }
+        </form>
+    }
+    else
+    {
+        <span class="text-muted small">@Model.Surveys.Count survey(s)</span>
+    }
+    <a asp-page="/Surveys/Create" class="btn btn-primary btn-sm"><i class="bi bi-plus-lg me-1"></i>New Survey</a>
+</div>
+
+<div class="row g-3">
+    @foreach (var row in Model.Surveys)
+    {
+        var s = row.Survey;
+        var starFill = (int)Math.Round(row.AvgRating);
+        <div class="col-md-6 col-xl-4">
+            <div class="card h-100 @(!s.IsActive ? "opacity-75" : "")">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span class="badge @(s.Category switch {
+                        SurveyCategory.CandidateAwareness => "bg-primary",
+                        SurveyCategory.LocalIssues        => "bg-warning text-dark",
+                        SurveyCategory.PartySupport       => "bg-success",
+                        SurveyCategory.DevelopmentFeedback=> "bg-info text-dark",
+                        _                                 => "bg-secondary"
+                    })">@s.Category</span>
+                    <span class="badge @(s.IsActive ? "bg-success" : "bg-secondary")">
+                        @(s.IsActive ? "Active" : "Inactive")
+                    </span>
+                </div>
+                <div class="card-body">
+                    <h6 class="fw-bold mb-1">@s.Title</h6>
+                    <p class="text-muted small mb-2">@s.Description</p>
+                    <div class="d-flex align-items-center gap-3 mb-2">
+                        <div class="text-center">
+                            <div class="fs-5 fw-bold text-primary">@row.ResponseCount</div>
+                            <div class="small text-muted">Responses</div>
+                        </div>
+                        <div class="text-center">
+                            <div class="fs-5 fw-bold text-warning">@(row.AvgRating > 0 ? row.AvgRating.ToString("0.0") : "—")</div>
+                            <div class="small text-muted">Avg Rating</div>
+                        </div>
+                        <div>
+                            @for (int i = 1; i <= 5; i++)
+                            {
+                                <i class="bi @(i <= starFill ? "bi-star-fill text-warning" : "bi-star text-muted")"></i>
+                            }
+                        </div>
+                    </div>
+                    @if (s.Constituency != null && Model.IsAdmin)
+                    {
+                        <div class="small text-muted"><i class="bi bi-geo-alt me-1"></i>@s.Constituency.Name</div>
+                    }
+                    <div class="small text-muted"><i class="bi bi-calendar me-1"></i>Created @s.CreatedAt.ToString("dd MMM yyyy")</div>
+                </div>
+                <div class="card-footer d-flex gap-2">
+                    <a asp-page="/Surveys/Details" asp-route-id="@s.Id" class="btn btn-sm btn-outline-primary flex-grow-1">
+                        <i class="bi bi-eye me-1"></i>View Responses
+                    </a>
+                    @if (Model.CanManage)
+                    {
+                        <a asp-page="/Surveys/Edit" asp-route-id="@s.Id" class="btn btn-sm btn-outline-secondary" title="Edit">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form method="post" asp-page-handler="Toggle" class="d-inline">
+                            <input type="hidden" name="id" value="@s.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-@(s.IsActive ? "warning" : "success")"
+                                title="@(s.IsActive ? "Deactivate" : "Activate")">
+                                <i class="bi @(s.IsActive ? "bi-pause-fill" : "bi-play-fill")"></i>
+                            </button>
+                        </form>
+                        <form method="post" asp-page-handler="Delete" class="d-inline"
+                            onsubmit="return confirm('Delete this survey and all its responses?')">
+                            <input type="hidden" name="id" value="@s.Id" />
+                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    }
+                </div>
+            </div>
+        </div>
+    }
+    @if (!Model.Surveys.Any())
+    {
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body text-center text-muted py-5">
+                    <i class="bi bi-clipboard2-x fs-1 d-block mb-2"></i>
+                    No surveys created yet.
+                    <div class="mt-2"><a asp-page="/Surveys/Create" class="btn btn-primary btn-sm">Create First Survey</a></div>
+                </div>
+            </div>
+        </div>
+    }
+</div>

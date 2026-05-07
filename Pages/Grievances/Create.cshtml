@@ -1,0 +1,62 @@
+@page
+@model ElectionCampaignTool.Pages.Grievances.CreateModel
+@{
+    ViewData["Title"] = "Add Grievance";
+}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-exclamation-triangle me-2"></i>Register New Grievance</div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="Grievance.Title" class="form-label fw-semibold">Issue Title *</label>
+                            <input asp-for="Grievance.Title" class="form-control" placeholder="Brief title of the issue" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Grievance.Description" class="form-label fw-semibold">Description *</label>
+                            <textarea asp-for="Grievance.Description" class="form-control" rows="3" placeholder="Detailed description..."></textarea>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Grievance.ReportedBy" class="form-label fw-semibold">Reported By</label>
+                            <input asp-for="Grievance.ReportedBy" class="form-control" placeholder="Name of reporter" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Grievance.ReporterPhone" class="form-label fw-semibold">Reporter Phone</label>
+                            <input asp-for="Grievance.ReporterPhone" class="form-control" placeholder="10-digit mobile" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Grievance.Priority" class="form-label fw-semibold">Priority</label>
+                            <select asp-for="Grievance.Priority" class="form-select"
+                                asp-items="Html.GetEnumSelectList<GrievancePriority>()"></select>
+                        </div>
+                        @if (Model.IsAdmin)
+                        {
+                        <div class="col-md-6">
+                            <label for="SelectedConstituencyId" class="form-label fw-semibold">Constituency *</label>
+                            <select id="SelectedConstituencyId" name="SelectedConstituencyId" class="form-select"
+                                asp-items="Model.ConstituencyList">
+                                <option value="">-- Select Constituency --</option>
+                            </select>
+                        </div>
+                        }
+                        <div class="col-md-6">
+                            <label asp-for="Grievance.Ward" class="form-label fw-semibold">Ward</label>
+                            <input asp-for="Grievance.Ward" class="form-control" placeholder="Ward number/name" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Grievance.Location" class="form-label fw-semibold">Location</label>
+                            <input asp-for="Grievance.Location" class="form-control" placeholder="Where is this issue located?" />
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Submit</button>
+                        <a asp-page="/Grievances/Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

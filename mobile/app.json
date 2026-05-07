@@ -1,0 +1,11 @@
+{
+  "expo": {
+    "name": "Election Campaign Tool",
+    "slug": "election-campaign-mobile",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "scheme": "electioncampaign",
+    "android": { "package": "com.india.electioncampaign" },
+    "ios": { "bundleIdentifier": "com.india.electioncampaign" }
+  }
+}

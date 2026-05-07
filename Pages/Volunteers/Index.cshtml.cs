@@ -1,0 +1,73 @@
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
+using ElectionCampaignTool.Domain.Entities;
+using ElectionCampaignTool.Domain.Enums;
+using ElectionCampaignTool.Infrastructure.Data;
+
+namespace ElectionCampaignTool.Pages.Volunteers;
+
+public class IndexModel : PageModel
+{
+    private static readonly UserRole[] ManageRoles = [UserRole.Admin, UserRole.CampaignManager, UserRole.Candidate];
+    private readonly AppDbContext _db;
+    private readonly UserManager<AppUser> _userManager;
+
+    public IndexModel(AppDbContext db, UserManager<AppUser> userManager)
+    {
+        _db = db;
+        _userManager = userManager;
+    }
+
+    public List<Volunteer> Volunteers { get; set; } = new();
+    public List<Constituency> Constituencies { get; set; } = new();
+    public bool IsAdmin { get; set; }
+    public bool CanManage { get; set; }
+
+    [BindProperty(SupportsGet = true)]
+    public int? ConstituencyFilter { get; set; }
+
+    public async Task OnGetAsync()
+    {
+        var user = await _userManager.GetUserAsync(User);
+        IsAdmin = user?.Role == UserRole.Admin;
+        CanManage = user != null && ManageRoles.Contains(user.Role);
+        if (IsAdmin)
+            Constituencies = await _db.Constituencies.OrderBy(c => c.Name).ToListAsync();
+
+        IQueryable<Volunteer> query = _db.Volunteers.OrderByDescending(v => v.RegisteredAt);
+        if (IsAdmin)
+        {
+            if (ConstituencyFilter.HasValue)
+                query = query.Where(v => v.ConstituencyId == ConstituencyFilter);
+        }
+        else if (user?.ConstituencyId.HasValue == true)
+            query = query.Where(v => v.ConstituencyId == user.ConstituencyId);
+        Volunteers = await query.ToListAsync();
+    }
+
+    public async Task<IActionResult> OnPostToggleAsync(int id)
+    {
+        var v = await _db.Volunteers.FindAsync(id);
+        if (v != null) { v.IsActive = !v.IsActive; await _db.SaveChangesAsync(); }
+        TempData["Message"] = "Volunteer status updated.";
+        return RedirectToPage();
+    }
+
+    public async Task<IActionResult> OnPostDeleteAsync(int id)
+    {
+        var user = await _userManager.GetUserAsync(User);
+        if (user == null || !ManageRoles.Contains(user.Role)) return Forbid();
+        var v = await _db.Volunteers.FindAsync(id);
+        if (v != null)
+        {
+            if (user.Role != UserRole.Admin && v.ConstituencyId != user.ConstituencyId)
+                return Forbid();
+            _db.Volunteers.Remove(v);
+            await _db.SaveChangesAsync();
+            TempData["Message"] = $"Volunteer '{v.Name}' deleted.";
+        }
+        return RedirectToPage();
+    }
+}

@@ -1,0 +1,79 @@
+@page "{id:int}"
+@model ElectionCampaignTool.Pages.Campaign.EditModel
+@{
+    ViewData["Title"] = "Edit Campaign Event";
+}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pencil-square me-2"></i>Edit Campaign Event</div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" asp-for="Event.Id" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+                    <div class="row g-3">
+                        @if (Model.IsAdmin)
+                        {
+                            <div class="col-12">
+                                <label asp-for="Event.ConstituencyId" class="form-label fw-semibold">Constituency *</label>
+                                <select asp-for="Event.ConstituencyId" class="form-select">
+                                    @foreach (var c in Model.Constituencies)
+                                    {
+                                        <option value="@c.Id">@c.Name</option>
+                                    }
+                                </select>
+                            </div>
+                        }
+                        <div class="col-12">
+                            <label asp-for="Event.Title" class="form-label fw-semibold">Event Title *</label>
+                            <input asp-for="Event.Title" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Event.EventType" class="form-label fw-semibold">Event Type *</label>
+                            <select asp-for="Event.EventType" class="form-select"
+                                asp-items="Html.GetEnumSelectList<CampaignEventType>()"></select>
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Event.ScheduledAt" class="form-label fw-semibold">Date & Time *</label>
+                            <input asp-for="Event.ScheduledAt" type="datetime-local" class="form-control" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Event.Location" class="form-label fw-semibold">Location *</label>
+                            <input asp-for="Event.Location" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Event.ExpectedAttendance" class="form-label fw-semibold">Expected Attendance</label>
+                            <input asp-for="Event.ExpectedAttendance" type="number" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Event.ActualAttendance" class="form-label fw-semibold">Actual Attendance</label>
+                            <input asp-for="Event.ActualAttendance" type="number" class="form-control" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Event.TargetBoothNumbers" class="form-label fw-semibold">Target Booths</label>
+                            <input asp-for="Event.TargetBoothNumbers" class="form-control" placeholder="e.g. 1,2,3" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Event.TargetWards" class="form-label fw-semibold">Target Wards</label>
+                            <input asp-for="Event.TargetWards" class="form-control" placeholder="e.g. 1,2" />
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Event.Description" class="form-label fw-semibold">Description</label>
+                            <textarea asp-for="Event.Description" class="form-control" rows="3"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="Event.IsCompleted" class="form-check-input" />
+                                <label asp-for="Event.IsCompleted" class="form-check-label fw-semibold">Mark as Completed</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save Changes</button>
+                        <a asp-page="/Campaign/Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

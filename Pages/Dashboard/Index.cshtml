@@ -1,0 +1,313 @@
+@page
+@model ElectionCampaignTool.Pages.Dashboard.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+    var anyFilter = Model.SelectedConstituencyId.HasValue
+                 || !string.IsNullOrEmpty(Model.SelectedWard)
+                 || Model.SelectedBoothNumber.HasValue;
+}
+
+@* ?? Drill-down filter bar ????????????????????????????????????????????????? *@
+@if (Model.IsAdmin || Model.Wards.Any())
+{
+    <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-4 p-3 bg-body-tertiary rounded border">
+        @* Constituency — Admin only *@
+        @if (Model.IsAdmin)
+        {
+            <div class="d-flex align-items-center gap-1">
+                <label class="fw-semibold text-nowrap small"><i class="bi bi-geo-alt-fill me-1 text-primary"></i>Constituency</label>
+                <select name="SelectedConstituencyId" id="selConstituency"
+                        class="form-select form-select-sm" style="min-width:200px"
+                        onchange="clearChildren(['selWard','selBooth']); this.form.submit();">
+                    <option value="">— All —</option>
+                    @foreach (var c in Model.Constituencies)
+                    {
+                        <option value="@c.Id" selected="@(Model.SelectedConstituencyId == c.Id)">@c.Name</option>
+                    }
+                </select>
+            </div>
+        }
+
+        @* Ward *@
+        @if (Model.Wards.Any())
+        {
+            <i class="bi bi-chevron-right text-muted small"></i>
+            <div class="d-flex align-items-center gap-1">
+                <label class="fw-semibold text-nowrap small"><i class="bi bi-map me-1 text-success"></i>Ward</label>
+                <select name="SelectedWard" id="selWard"
+                        class="form-select form-select-sm" style="min-width:185px"
+                        onchange="clearChildren(['selBooth']); this.form.submit();">
+                    <option value="">— All Wards —</option>
+                    @foreach (var w in Model.Wards)
+                    {
+                        <option value="@w.WardNumber" selected="@(Model.SelectedWard == w.WardNumber)">@w.WardName</option>
+                    }
+                </select>
+            </div>
+            @* preserve parent value as hidden when rendering ward independently *@
+            @if (!Model.IsAdmin && Model.SelectedConstituencyId.HasValue)
+            {
+                <input type="hidden" name="SelectedConstituencyId" value="@Model.SelectedConstituencyId" />
+            }
+        }
+
+        @* Booth — appears once a ward is selected and booths exist *@
+        @if (Model.BoothOptions.Any())
+        {
+            <i class="bi bi-chevron-right text-muted small"></i>
+            <div class="d-flex align-items-center gap-1">
+                <label class="fw-semibold text-nowrap small"><i class="bi bi-grid-3x3-gap me-1 text-warning"></i>Booth</label>
+                <select name="SelectedBoothNumber" id="selBooth"
+                        class="form-select form-select-sm" style="min-width:170px"
+                        onchange="this.form.submit();">
+                    <option value="">— All Booths —</option>
+                    @foreach (var b in Model.BoothOptions)
+                    {
+                        <option value="@b.BoothNumber" selected="@(Model.SelectedBoothNumber == b.BoothNumber)">
+                            #@b.BoothNumber – @b.BoothName
+                        </option>
+                    }
+                </select>
+            </div>
+            <input type="hidden" name="SelectedWard" value="@Model.SelectedWard" />
+        }
+
+        @* Active filter breadcrumb *@
+        @if (anyFilter)
+        {
+            <div class="ms-auto d-flex align-items-center gap-2">
+                <span class="badge bg-primary-subtle text-primary border border-primary-subtle px-2 py-1">
+                    <i class="bi bi-funnel-fill me-1"></i>
+                    @if (Model.SelectedBoothNumber.HasValue)
+                    {
+                        @($"Booth #{Model.SelectedBoothNumber}")
+                    }
+                    else if (!string.IsNullOrEmpty(Model.SelectedWard))
+                    {
+                        @($"Ward {Model.SelectedWard}")
+                    }
+                    else if (!string.IsNullOrEmpty(Model.ActiveConstituencyName))
+                    {
+                        @Model.ActiveConstituencyName
+                    }
+                </span>
+                <a href="/Dashboard" class="btn btn-sm btn-outline-secondary py-0">
+                    <i class="bi bi-x-lg me-1"></i>Clear
+                </a>
+            </div>
+        }
+    </form>
+}
+else if (!string.IsNullOrEmpty(Model.ActiveConstituencyName))
+{
+    <div class="alert alert-info py-2 mb-4 d-flex align-items-center gap-2">
+        <i class="bi bi-geo-alt-fill text-primary"></i>
+        <span><strong>Constituency:</strong> @Model.ActiveConstituencyName</span>
+    </div>
+}
+
+<!-- Stats Row -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-primary bg-opacity-10">
+                    <i class="bi bi-people-fill text-primary"></i>
+                </div>
+                <div>
+                    <div class="fs-4 fw-bold">@Model.TotalVoters.ToString("N0")</div>
+                    <div class="small text-muted">Total Voters</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-success bg-opacity-10">
+                    <i class="bi bi-hand-thumbs-up-fill text-success"></i>
+                </div>
+                <div>
+                    <div class="fs-4 fw-bold">@Model.FavourVoters.ToString("N0")</div>
+                    <div class="small text-muted">In Favour</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-warning bg-opacity-10">
+                    <i class="bi bi-geo-alt-fill text-warning"></i>
+                </div>
+                <div>
+                    <div class="fs-4 fw-bold">@Model.TotalBooths</div>
+                    <div class="small text-muted">Booths</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card stat-card h-100">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon bg-danger bg-opacity-10">
+                    <i class="bi bi-exclamation-triangle-fill text-danger"></i>
+                </div>
+                <div>
+                    <div class="fs-4 fw-bold">@Model.OpenGrievances</div>
+                    <div class="small text-muted">Open Grievances</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mb-4">
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header d-flex align-items-center justify-content-between">
+                <span><i class="bi bi-pie-chart-fill me-2 text-primary"></i>Voter Sentiment</span>
+            </div>
+            <div class="card-body">
+                <div class="chart-container" style="height:220px">
+                    <canvas id="sentimentChart"></canvas>
+                </div>
+                <div class="mt-3">
+                    @foreach (var s in Model.SentimentBreakdown)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-1">
+                            <span class="small">@s.Key</span>
+                            <div class="d-flex align-items-center gap-2">
+                                <div class="turnout-bar" style="width:80px">
+                                    <div class="turnout-bar-fill" style="width:@(Model.TotalVoters > 0 ? (s.Value * 100 / Model.TotalVoters) : 0)%"></div>
+                                </div>
+                                <span class="small fw-bold">@s.Value</span>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-geo-alt me-2 text-warning"></i>Booth-wise Voters
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead><tr><th>Booth</th><th>Voters</th><th>Agent</th></tr></thead>
+                        <tbody>
+                        @foreach (var b in Model.BoothSummary)
+                        {
+                            <tr>
+                                <td><span class="badge bg-secondary">#@b.BoothNumber</span> @b.BoothName</td>
+                                <td>@b.TotalVoters</td>
+                                <td><span class="badge @(string.IsNullOrEmpty(b.AssignedAgentName) ? "bg-light text-muted" : "bg-success")">
+                                    @(string.IsNullOrEmpty(b.AssignedAgentName) ? "Unassigned" : "Assigned")</span></td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card h-100">
+            <div class="card-header">
+                <i class="bi bi-clock-history me-2 text-info"></i>Upcoming Events
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.UpcomingEvents.Any())
+                {
+                    <div class="p-3 text-center text-muted small">No upcoming events</div>
+                }
+                @foreach (var ev in Model.UpcomingEvents)
+                {
+                    <div class="d-flex align-items-start gap-2 px-3 py-2 border-bottom">
+                        <div class="badge bg-primary rounded-circle p-2"><i class="bi bi-calendar3"></i></div>
+                        <div>
+                            <div class="small fw-semibold">@ev.Title</div>
+                            <div class="text-muted" style="font-size:0.75rem">@ev.ScheduledAt.ToString("dd MMM, h:mm tt") — @ev.Location</div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer text-end">
+                <a asp-page="/Campaign/Index" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-person-check me-2 text-success"></i>Volunteers (@Model.TotalVolunteers)</span>
+                <a asp-page="/Volunteers/Index" class="btn btn-sm btn-outline-success">Manage</a>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="fs-4 fw-bold text-success">@Model.ActiveVolunteers</div>
+                        <div class="small text-muted">Active</div>
+                    </div>
+                    <div class="col">
+                        <div class="fs-4 fw-bold text-primary">@Model.TotalVolunteers</div>
+                        <div class="small text-muted">Total</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-cash-coin me-2 text-warning"></i>Expense Summary</span>
+                <a asp-page="/Expenses/Index" class="btn btn-sm btn-outline-warning">View</a>
+            </div>
+            <div class="card-body">
+                <div class="row text-center">
+                    <div class="col">
+                        <div class="fs-4 fw-bold">?@Model.TotalExpenses.ToString("N0")</div>
+                        <div class="small text-muted">Total Spent</div>
+                    </div>
+                    <div class="col">
+                        <div class="fs-4 fw-bold text-success">@Model.ECCompliantExpenses</div>
+                        <div class="small text-muted">EC Compliant</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Reset child selects to blank before cascade-submitting
+    function clearChildren(ids) {
+        ids.forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+    }
+
+    const ctx = document.getElementById('sentimentChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SentimentBreakdown.Keys)),
+            datasets: [{
+                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.SentimentBreakdown.Values)),
+                backgroundColor: ['#51cf66','#ff6b6b','#74c0fc','#ffd43b','#adb5bd'],
+                borderWidth: 0
+            }]
+        },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom', labels: { font: { size: 11 } } } } }
+    });
+</script>
+}

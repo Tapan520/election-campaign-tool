@@ -1,0 +1,159 @@
+@page "{id:int}"
+@model ElectionCampaignTool.Pages.Voters.DetailsModel
+@{
+    ViewData["Title"] = "Voter Details";
+}
+
+@if (Model.Voter == null)
+{
+    <div class="alert alert-warning">Voter not found.</div>
+    return;
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-auto-dismiss">@TempData["Message"]</div>
+}
+
+<div class="row g-3">
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="bg-secondary bg-opacity-10 rounded-circle d-inline-flex align-items-center justify-content-center mb-3"
+                     style="width:80px;height:80px;">
+                    <i class="bi bi-person-fill fs-1 text-secondary"></i>
+                </div>
+                <h5 class="mb-0">@Model.Voter.Name</h5>
+                @if (!string.IsNullOrEmpty(Model.Voter.NameLocal))
+                {
+                    <div class="text-muted small">@Model.Voter.NameLocal</div>
+                }
+                <div class="mt-2">
+                    <span class="badge badge-@Model.Voter.Sentiment.ToString().ToLower() fs-6">@Model.Voter.Sentiment</span>
+                </div>
+                <div class="mt-3">
+                    <span class="badge bg-secondary font-monospace fs-6">@Model.Voter.VoterId</span>
+                </div>
+            </div>
+            <div class="card-footer">
+                <!-- Update Sentiment -->
+                <form method="post" asp-page-handler="UpdateSentiment" class="mb-2">
+                    <input type="hidden" name="id" value="@Model.Voter.Id" />
+                    <div class="input-group input-group-sm">
+                        <select name="sentiment" class="form-select form-select-sm">
+                            @foreach (var s in Enum.GetValues<VoterSentiment>())
+                            {
+                                if (Model.Voter.Sentiment == s)
+                                {
+                                    <option value="@s" selected>@s</option>
+                                }
+                                else
+                                {
+                                    <option value="@s">@s</option>
+                                }
+                            }
+                        </select>
+                        <button type="submit" class="btn btn-sm btn-primary">Update</button>
+                    </div>
+                </form>
+                <div class="d-flex gap-2">
+                    <a asp-page="/Voters/Edit" asp-route-id="@Model.Voter.Id" class="btn btn-sm btn-outline-secondary flex-fill">
+                        <i class="bi bi-pencil me-1"></i>Edit
+                    </a>
+                    <a asp-page="/Voters/Index" class="btn btn-sm btn-outline-secondary flex-fill">
+                        <i class="bi bi-arrow-left me-1"></i>Back
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-8">
+        <div class="card mb-3">
+            <div class="card-header"><i class="bi bi-person-lines-fill me-2"></i>Voter Information</div>
+            <div class="card-body">
+                <div class="row g-2 small">
+                    <div class="col-6"><strong>Serial No.:</strong> @Model.Voter.SerialNumber</div>
+                    <div class="col-6"><strong>EPIC No.:</strong> <span class="font-monospace">@Model.Voter.VoterId</span></div>
+                    <div class="col-6"><strong>Age:</strong> @Model.Voter.Age</div>
+                    <div class="col-6"><strong>Gender:</strong> @(Model.Voter.Gender == "M" ? "Male" : Model.Voter.Gender == "F" ? "Female" : "Other")</div>
+                    <div class="col-6"><strong>Father/Husband:</strong> @(Model.Voter.FatherHusbandName ?? "—")</div>
+                    <div class="col-6"><strong>Mobile:</strong> @(Model.Voter.MobileNumber ?? "—")</div>
+                    <div class="col-12"><strong>Address:</strong> @Model.Voter.Address</div>
+                    <div class="col-6"><strong>Booth No.:</strong> @Model.Voter.BoothNumber</div>
+                    <div class="col-6"><strong>Ward No.:</strong> @(Model.Voter.WardNumber ?? "—")</div>
+                    <div class="col-6"><strong>Panna No.:</strong> @(Model.Voter.PannaNumber ?? "—")</div>
+                    <div class="col-6"><strong>Election Day:</strong>
+                        <span class="badge @(Model.Voter.ElectionDayStatus == ElectionDayStatus.Voted ? "bg-success" : "bg-light text-dark")">
+                            @Model.Voter.ElectionDayStatus
+                        </span>
+                    </div>
+                    @if (Model.Voter.Notes != null)
+                    {
+                        <div class="col-12"><strong>Notes:</strong> @Model.Voter.Notes</div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header"><i class="bi bi-door-open me-2"></i>Door-to-Door Visit History</div>
+            <div class="card-body p-0">
+                @if (!Model.Visits.Any())
+                {
+                    <div class="text-center text-muted py-3 small">No visits recorded yet.</div>
+                }
+                else
+                {
+                    <div class="table-responsive">
+                        <table class="table table-sm mb-0">
+                            <thead><tr><th>Date</th><th>Worker</th><th>Status</th><th>Sentiment</th><th>Notes</th></tr></thead>
+                            <tbody>
+                            @foreach (var v in Model.Visits)
+                            {
+                                <tr>
+                                    <td class="small">@v.VisitedAt.ToString("dd MMM yy")</td>
+                                    <td class="small">@v.WorkerName</td>
+                                    <td><span class="badge bg-info">@v.Status</span></td>
+                                    <td><span class="badge badge-@v.SentimentAfterVisit.ToString().ToLower()">@v.SentimentAfterVisit</span></td>
+                                    <td class="small">@v.Notes</td>
+                                </tr>
+                            }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+            <div class="card-footer">
+                <!-- Log a visit -->
+                <form method="post" asp-page-handler="LogVisit" class="row g-2">
+                    <input type="hidden" name="id" value="@Model.Voter.Id" />
+                    <div class="col-md-4">
+                        <select name="visitStatus" class="form-select form-select-sm">
+                            @foreach (var vs in Enum.GetValues<VisitStatus>())
+                            {
+                                <option value="@vs">@vs</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <select name="sentiment" class="form-select form-select-sm">
+                            @foreach (var s in Enum.GetValues<VoterSentiment>())
+                            {
+                                <option value="@s">@s</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-md-4">
+                        <input type="text" name="notes" class="form-control form-control-sm" placeholder="Notes..." />
+                    </div>
+                    <div class="col-12">
+                        <button type="submit" class="btn btn-sm btn-success">
+                            <i class="bi bi-plus-circle me-1"></i>Log Visit
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

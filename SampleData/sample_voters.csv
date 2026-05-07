@@ -1,0 +1,21 @@
+VoterId,Name,NameLocal,FatherHusbandName,Age,Gender,MobileNumber,Address,BoothNumber,WardNumber,PannaNumber,SerialNumber
+MH1600001,Rajesh Kumar,????? ?????,Ram Kumar,45,M,9876543210,"House 12, Ward 1, Pune",1,1,1,1
+MH1600002,Sunita Sharma,?????? ?????,Suresh Sharma,38,F,9876543211,"House 13, Ward 1, Pune",1,1,1,2
+MH1600003,Amit Patel,???? ????,Ashok Patel,52,M,9876543212,"House 14, Ward 1, Pune",1,1,1,3
+MH1600004,Priya Singh,?????? ????,Vijay Singh,29,F,,"House 15, Ward 1, Pune",1,1,1,4
+MH1600005,Vijay Rao,???? ???,Venkat Rao,61,M,9876543214,"House 16, Ward 1, Pune",1,1,1,5
+MH1600006,Meena Joshi,???? ????,Mohan Joshi,47,F,9876543215,"House 17, Ward 1, Pune",1,1,1,6
+MH1600007,Sanjay Gupta,???? ??????,Shiv Gupta,33,M,9876543216,"House 18, Ward 1, Pune",1,1,1,7
+MH1600008,Kavitha Nair,????? ????,Krishna Nair,41,F,,"House 19, Ward 1, Pune",1,1,1,8
+MH1600009,Dinesh Patil,????? ?????,Dattatray Patil,55,M,9876543218,"House 20, Ward 1, Pune",1,1,1,9
+MH1600010,Anita More,????? ????,Arun More,26,F,9876543219,"House 21, Ward 1, Pune",1,1,1,10
+MH1600011,Suresh Yadav,????? ????,Satish Yadav,39,M,9876543220,"House 22, Ward 2, Pune",2,2,1,1
+MH1600012,Rekha Desai,???? ?????,Ramesh Desai,44,F,9876543221,"House 23, Ward 2, Pune",2,2,1,2
+MH1600013,Mahesh Bhatt,???? ????,Mangesh Bhatt,58,M,,"House 24, Ward 2, Pune",2,2,1,3
+MH1600014,Deepa Kulkarni,???? ????????,Dilip Kulkarni,32,F,9876543223,"House 25, Ward 2, Pune",2,2,1,4
+MH1600015,Nitin Chavan,????? ??????,Narayan Chavan,48,M,9876543224,"House 26, Ward 2, Pune",2,2,1,5
+MH1600016,Pooja Sawant,???? ?????,Prakash Sawant,27,F,9876543225,"House 27, Ward 2, Pune",2,2,1,6
+MH1600017,Ravi Shinde,??? ?????,Rajaram Shinde,63,M,,"House 28, Ward 2, Pune",2,2,2,7
+MH1600018,Smita Kadam,?????? ???,Sanjeev Kadam,36,F,9876543227,"House 29, Ward 2, Pune",2,2,2,8
+MH1600019,Arun Gaikwad,???? ???????,Ashok Gaikwad,50,M,9876543228,"House 30, Ward 2, Pune",2,2,2,9
+MH1600020,Lata Pawar,??? ????,Laxman Pawar,42,F,9876543229,"House 31, Ward 2, Pune",2,2,2,10

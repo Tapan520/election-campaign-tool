@@ -1,0 +1,94 @@
+@page
+@model ElectionCampaignTool.Pages.Volunteers.IndexModel
+@{
+    ViewData["Title"] = "Volunteers";
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-auto-dismiss">@TempData["Message"]</div>
+}
+
+<div class="d-flex justify-content-between mb-3">
+    <div class="d-flex align-items-center gap-3">
+        <span class="text-muted small">@Model.Volunteers.Count volunteers</span>
+        @if (Model.IsAdmin)
+        {
+            <form method="get" class="d-flex gap-2 align-items-center">
+                <select name="constituencyFilter" class="form-select form-select-sm" onchange="this.form.submit()" style="width:200px">
+                    <option value="">All Constituencies</option>
+                    @foreach (var c in Model.Constituencies)
+                    {
+                        <option value="@c.Id" selected="@(Model.ConstituencyFilter == c.Id)">@c.Name</option>
+                    }
+                </select>
+            </form>
+        }
+    </div>
+    @if (Model.CanManage)
+    {
+        <a asp-page="/Volunteers/Create" class="btn btn-primary btn-sm"><i class="bi bi-person-plus me-1"></i>Add Volunteer</a>
+    }
+</div>
+
+<div class="card">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead>
+                    <tr><th>Name</th><th>Phone</th><th>Task</th><th>Area</th><th>Booths</th><th>Status</th><th></th></tr>
+                </thead>
+                <tbody>
+                @foreach (var v in Model.Volunteers)
+                {
+                    <tr>
+                        <td><div class="fw-semibold">@v.Name</div>
+                            @if (!string.IsNullOrEmpty(v.Email)) { <small class="text-muted">@v.Email</small> }
+                        </td>
+                        <td>@v.Phone</td>
+                        <td><span class="badge bg-info text-dark">@v.Task</span></td>
+                        <td>@(v.AssignedArea ?? "—")</td>
+                        <td>@(v.AssignedBoothNumbers ?? "—")</td>
+                        <td>
+                            <span class="badge @(v.IsActive ? "bg-success" : "bg-secondary")">
+                                @(v.IsActive ? "Active" : "Inactive")
+                            </span>
+                        </td>
+                        <td>
+                            <div class="d-flex gap-1">
+                            @if (Model.CanManage)
+                            {
+                                <form method="post" asp-page-handler="Toggle" class="d-inline">
+                                    <input type="hidden" name="id" value="@v.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-@(v.IsActive ? "warning" : "success") py-0" title="@(v.IsActive ? "Deactivate" : "Activate")">
+                                        <i class="bi bi-@(v.IsActive ? "pause" : "play")"></i>
+                                    </button>
+                                </form>
+                                <a asp-page="/Volunteers/Edit" asp-route-id="@v.Id" class="btn btn-sm btn-outline-primary py-0" title="Edit">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <form method="post" asp-page-handler="Delete" class="d-inline"
+                                    onsubmit="return confirm('Delete this volunteer?')">
+                                    <input type="hidden" name="id" value="@v.Id" />
+                                    <button type="submit" class="btn btn-sm btn-outline-danger py-0" title="Delete">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </form>
+                            }
+                            else
+                            {
+                                <span class="badge @(v.IsActive ? "bg-success" : "bg-secondary")">@(v.IsActive ? "Active" : "Inactive")</span>
+                            }
+                            </div>
+                        </td>
+                    </tr>
+                }
+                @if (!Model.Volunteers.Any())
+                {
+                    <tr><td colspan="7" class="text-center text-muted py-4">No volunteers added yet.</td></tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,49 @@
+@page
+@model ElectionCampaignTool.Pages.Admin.Wards.CreateModel
+@{
+    ViewData["Title"] = "Add Ward";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-map me-2"></i>Add New Ward</div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="Input.ConstituencyId" class="form-label fw-semibold">Constituency *</label>
+                            <select asp-for="Input.ConstituencyId" asp-items="Model.ConstituencyItems" class="form-select">
+                                <option value="">-- Select Constituency --</option>
+                            </select>
+                            <span asp-validation-for="Input.ConstituencyId" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-4">
+                            <label asp-for="Input.WardNumber" class="form-label fw-semibold">Ward Number *</label>
+                            <input asp-for="Input.WardNumber" class="form-control" placeholder="e.g. 5" />
+                            <span asp-validation-for="Input.WardNumber" class="text-danger small"></span>
+                        </div>
+                        <div class="col-md-8">
+                            <label asp-for="Input.WardName" class="form-label fw-semibold">Ward Name *</label>
+                            <input asp-for="Input.WardName" class="form-control" placeholder="e.g. Gandhi Nagar Ward" />
+                            <span asp-validation-for="Input.WardName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Input.Description" class="form-label fw-semibold">Description</label>
+                            <textarea asp-for="Input.Description" class="form-control" rows="2"></textarea>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Save</button>
+                        <a asp-page="/Admin/Wards/Index" asp-route-constituencyId="@Model.ConstituencyId" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

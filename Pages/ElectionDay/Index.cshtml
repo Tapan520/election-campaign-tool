@@ -1,0 +1,148 @@
+@page
+@model ElectionCampaignTool.Pages.ElectionDay.IndexModel
+@{
+    ViewData["Title"] = "Election Day - Live Tracking";
+}
+
+<div class="row g-3 mb-4">
+@if (TempData["Message"] != null)
+{
+    <div class="col-12"><div class="alert alert-success alert-auto-dismiss">@TempData["Message"]</div></div>
+}
+@if (TempData["Error"] != null)
+{
+    <div class="col-12"><div class="alert alert-warning alert-auto-dismiss">@TempData["Error"]</div></div>
+}
+@if (Model.IsAdmin)
+{
+    <div class="col-12">
+        <form method="get" class="d-flex align-items-center gap-2">
+            <label class="fw-semibold mb-0 text-nowrap">Constituency:</label>
+            <select name="constituencyFilter" class="form-select form-select-sm" onchange="this.form.submit()" style="max-width:280px">
+                @foreach (var c in Model.Constituencies)
+                {
+                    <option value="@c.Id" selected="@(Model.ConstituencyId == c.Id)">@c.Name</option>
+                }
+            </select>
+        </form>
+    </div>
+}
+<div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="d-flex align-items-center justify-content-center gap-2 mb-1">
+                    <span class="live-dot"></span>
+                    <span class="text-success fw-semibold small">LIVE</span>
+                </div>
+                <div id="overall-turnout" class="display-5 fw-bold text-primary">@Model.OverallPercent%</div>
+                <div class="text-muted small">Overall Turnout</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div id="overall-voted" class="display-5 fw-bold text-success">@Model.TotalVoted</div>
+                <div class="text-muted small">Voters Voted</div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card text-center">
+            <div class="card-body">
+                <div class="display-5 fw-bold text-secondary">@Model.TotalVoters</div>
+                <div class="text-muted small">Total Eligible Voters</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mark Voter Voted -->
+<div class="card mb-4">
+    <div class="card-header"><i class="bi bi-check2-square me-2 text-success"></i>Mark Voter as Voted</div>
+    <div class="card-body">
+        <form method="post" asp-page-handler="MarkVoted" class="row g-2 align-items-end" id="markVotedForm">
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Search Voter (EPIC / Name)</label>
+                <input type="text" id="voterSearch" class="form-control" placeholder="Type EPIC or name..." autocomplete="off" />
+            </div>
+            <div class="col-md-4">
+                <label class="form-label fw-semibold">Select Voter</label>
+                <select name="voterId" id="voterSelect" class="form-select">
+                    <option value="">-- search above --</option>
+                    @foreach (var v in Model.TodayVoters)
+                    {
+                        <option value="@v.Id" data-name="@v.Name" data-epic="@v.VoterId">
+                            [@v.VoterId] @v.Name — Booth @v.BoothNumber (@v.ElectionDayStatus)
+                        </option>
+                    }
+                </select>
+                <div id="voterSelectError" class="text-danger small d-none">Please select a voter.</div>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-success w-100">
+                    <i class="bi bi-check-circle me-1"></i>Mark Voted
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Booth-wise Turnout -->
+<div class="card">
+    <div class="card-header"><i class="bi bi-bar-chart me-2"></i>Booth-wise Live Turnout</div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table mb-0">
+                <thead>
+                    <tr><th>Booth</th><th>Booth Name</th><th>Total</th><th>Voted</th><th>Turnout</th><th>Progress</th></tr>
+                </thead>
+                <tbody>
+                @foreach (var b in Model.BoothTurnout)
+                {
+                    <tr data-booth="@b.BoothNumber">
+                        <td><span class="badge bg-primary">#@b.BoothNumber</span></td>
+                        <td>@b.BoothName</td>
+                        <td>@b.TotalVoters</td>
+                        <td class="voted-count fw-bold text-success">@b.VotedCount</td>
+                        <td class="turnout-pct fw-bold">@b.TurnoutPercent%</td>
+                        <td style="min-width:120px">
+                            <div class="turnout-bar">
+                                <div class="turnout-bar-fill" style="width:@b.TurnoutPercent%"></div>
+                            </div>
+                        </td>
+                    </tr>
+                }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/8.0.0/signalr.min.js"></script>
+<script>window._constituencyId = @Model.ConstituencyId;</script>
+<script src="~/js/electionday.js" asp-append-version="true"></script>
+<script>
+    // Simple voter search filter
+    document.getElementById('voterSearch').addEventListener('input', function() {
+        const search = this.value.toLowerCase();
+        const select = document.getElementById('voterSelect');
+        for (let opt of select.options) {
+            if (opt.value === '') continue;
+            opt.hidden = !opt.text.toLowerCase().includes(search);
+        }
+    });
+    // Validate voter selection before submit
+    document.getElementById('markVotedForm').addEventListener('submit', function(e) {
+        const select = document.getElementById('voterSelect');
+        const errEl = document.getElementById('voterSelectError');
+        if (!select.value) {
+            e.preventDefault();
+            errEl.classList.remove('d-none');
+        } else {
+            errEl.classList.add('d-none');
+        }
+    });
+</script>
+}

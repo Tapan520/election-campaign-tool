@@ -1,0 +1,65 @@
+@page
+@model ElectionCampaignTool.Pages.Admin.EditUserModel
+@{
+    ViewData["Title"] = "Edit User";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header"><i class="bi bi-pencil me-2"></i>Edit User</div>
+            <div class="card-body">
+                <form method="post">
+                    <input type="hidden" asp-for="UserId" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger small"></div>
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label asp-for="Input.FullName" class="form-label fw-semibold">Full Name *</label>
+                            <input asp-for="Input.FullName" class="form-control" />
+                            <span asp-validation-for="Input.FullName" class="text-danger small"></span>
+                        </div>
+                        <div class="col-12">
+                            <label asp-for="Input.PhoneNumber" class="form-label fw-semibold">Phone</label>
+                            <input asp-for="Input.PhoneNumber" class="form-control" />
+                        </div>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <div class="col-md-6">
+                                <label asp-for="Input.Role" class="form-label fw-semibold">Role *</label>
+                                <select asp-for="Input.Role" asp-items="Model.RoleItems" class="form-select"></select>
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Input.ConstituencyId" class="form-label fw-semibold">Constituency</label>
+                                <select asp-for="Input.ConstituencyId" asp-items="Model.ConstituencyItems" class="form-select">
+                                    <option value="">-- All --</option>
+                                </select>
+                            </div>
+                        }
+                        <div class="col-md-6">
+                            <label asp-for="Input.AssignedBoothNumbers" class="form-label fw-semibold">Assigned Booths</label>
+                            <input asp-for="Input.AssignedBoothNumbers" class="form-control" placeholder="e.g. 1,2,3" />
+                        </div>
+                        <div class="col-md-6">
+                            <label asp-for="Input.AssignedWard" class="form-label fw-semibold">Assigned Ward</label>
+                            <input asp-for="Input.AssignedWard" class="form-control" placeholder="Ward number" />
+                        </div>
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="Input.IsActive" class="form-check-input" type="checkbox" />
+                                <label asp-for="Input.IsActive" class="form-check-label">Active</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="mt-3 d-flex gap-2">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-save me-1"></i>Update</button>
+                        <a asp-page="/Admin/Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}
