@@ -66,12 +66,12 @@ export default function LoginScreen() {
           </TouchableOpacity>
         </View>
 
-        <View style={s.demo}>
-          <Text style={s.demoTitle}>Demo Accounts</Text>
-          <Text style={s.demoLine}>admin@election.com / Admin@123</Text>
-          <Text style={s.demoLine}>manager@election.com / Manager@123</Text>
-          <Text style={s.demoLine}>worker@election.com / Worker@123</Text>
-        </View>
+        {/*<View style={s.demo}>*/}
+        {/*  <Text style={s.demoTitle}>Demo Accounts</Text>*/}
+        {/*  <Text style={s.demoLine}>admin@election.com / Admin@123</Text>*/}
+        {/*  <Text style={s.demoLine}>manager@election.com / Manager@123</Text>*/}
+        {/*  <Text style={s.demoLine}>worker@election.com / Worker@123</Text>*/}
+        {/*</View>*/}
       </ScrollView>
     </KeyboardAvoidingView>
   );
