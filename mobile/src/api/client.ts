@@ -1,11 +1,15 @@
 import axios from 'axios';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-// API Base URL — auto-detects emulator vs physical device
+// ?? API Base URL ???????????????????????????????????????????????????????????????
+//  PRODUCTION  (Railway)  ? currently active
+export const API_BASE_URL = 'https://electioncampaign-production.up.railway.app';
+
+//  LOCAL DEVELOPMENT  (uncomment one when testing locally)
 //  Android emulator  ? http://10.0.2.2:5211
 //  iOS simulator     ? http://localhost:5211
-//  Physical device   ? http://192.168.29.24:5211  (machine IP on local network)
-export const API_BASE_URL = 'http://192.168.29.24:5211';
+//  Physical device   ? http://192.168.29.24:5211  (your machine LAN IP)
+// export const API_BASE_URL = 'http://10.0.2.2:5211';
 
 const apiClient = axios.create({
   baseURL: `${API_BASE_URL}/api`,
