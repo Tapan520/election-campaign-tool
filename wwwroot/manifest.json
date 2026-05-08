@@ -1,21 +1,28 @@
 {
   "name": "Election Campaign Tool",
   "short_name": "ElectionTool",
-  "description": "Election Campaign Management for MLA & Ward Elections",
+  "description": "India MLA & Ward Election Campaign Management System",
   "start_url": "/Dashboard/Index",
+  "scope": "/",
   "display": "standalone",
+  "orientation": "portrait",
   "background_color": "#1a1f2e",
   "theme_color": "#3b5bdb",
+  "lang": "en",
   "icons": [
     {
       "src": "/icons/icon-192.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "/icons/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
-  ]
+  ],
+  "screenshots": [],
+  "categories": ["productivity", "government"]
 }
