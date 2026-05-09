@@ -5,7 +5,16 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "electioncampaign",
-    "android": { "package": "com.india.electioncampaign" },
-    "ios": { "bundleIdentifier": "com.india.electioncampaign" }
+    "android": {
+      "package": "com.india.electioncampaign"
+    },
+    "ios": {
+      "bundleIdentifier": "com.india.electioncampaign"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "81d94d95-a662-44f6-b1ac-17a1397893e6"
+      }
+    }
   }
 }
