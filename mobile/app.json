@@ -5,6 +5,7 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "scheme": "electioncampaign",
+    "newArchEnabled": false,
     "android": {
       "package": "com.india.electioncampaign"
     },
