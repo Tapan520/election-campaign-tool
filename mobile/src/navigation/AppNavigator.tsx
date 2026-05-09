@@ -13,17 +13,23 @@ import ElectionDayScreen from '../screens/ElectionDayScreen';
 import BoothsScreen from '../screens/BoothsScreen';
 import GrievancesScreen from '../screens/GrievancesScreen';
 import AddGrievanceScreen from '../screens/AddGrievanceScreen';
+import VolunteersScreen from '../screens/VolunteersScreen';
+import CampaignEventsScreen from '../screens/CampaignEventsScreen';
+import AnalyticsScreen from '../screens/AnalyticsScreen';
+import SurveysScreen from '../screens/SurveysScreen';
+import ExpensesScreen from '../screens/ExpensesScreen';
+import MoreScreen from '../screens/MoreScreen';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 const BRAND = '#3b5bdb';
 
 const TAB_ICONS: Record<string, string> = {
-  Dashboard: 'speedometer-outline',
-  Voters: 'people-outline',
+  Dashboard:    'speedometer-outline',
+  Voters:       'people-outline',
   'Election Day': 'checkmark-circle-outline',
-  Booths: 'location-outline',
-  Grievances: 'alert-circle-outline',
+  Grievances:   'alert-circle-outline',
+  More:         'grid-outline',
 };
 
 function MainTabs() {
@@ -43,11 +49,11 @@ function MainTabs() {
         ),
       })}
     >
-      <Tab.Screen name="Dashboard" component={DashboardScreen} />
-      <Tab.Screen name="Voters" component={VoterListScreen} />
+      <Tab.Screen name="Dashboard"    component={DashboardScreen} />
+      <Tab.Screen name="Voters"       component={VoterListScreen} />
       <Tab.Screen name="Election Day" component={ElectionDayScreen} />
-      <Tab.Screen name="Booths" component={BoothsScreen} />
-      <Tab.Screen name="Grievances" component={GrievancesScreen} />
+      <Tab.Screen name="Grievances"   component={GrievancesScreen} />
+      <Tab.Screen name="More"         component={MoreScreen} />
     </Tab.Navigator>
   );
 }
@@ -69,10 +75,25 @@ export default function AppNavigator() {
         {user ? (
           <>
             <Stack.Screen name="Main" component={MainTabs} />
+            {/* Voter Stack */}
             <Stack.Screen name="VoterDetail" component={VoterDetailScreen}
               options={{ headerShown: true, title: 'Voter Details', headerTintColor: BRAND }} />
+            {/* Grievance Stack */}
             <Stack.Screen name="AddGrievance" component={AddGrievanceScreen}
               options={{ headerShown: true, title: 'Add Grievance', headerTintColor: BRAND }} />
+            {/* More ? full screens */}
+            <Stack.Screen name="Booths" component={BoothsScreen}
+              options={{ headerShown: true, title: 'Booth Management', headerTintColor: BRAND }} />
+            <Stack.Screen name="Volunteers" component={VolunteersScreen}
+              options={{ headerShown: true, title: 'Volunteers', headerTintColor: BRAND }} />
+            <Stack.Screen name="CampaignEvents" component={CampaignEventsScreen}
+              options={{ headerShown: true, title: 'Campaign Events', headerTintColor: BRAND }} />
+            <Stack.Screen name="Analytics" component={AnalyticsScreen}
+              options={{ headerShown: true, title: 'Analytics', headerTintColor: BRAND }} />
+            <Stack.Screen name="Surveys" component={SurveysScreen}
+              options={{ headerShown: true, title: 'Surveys', headerTintColor: BRAND }} />
+            <Stack.Screen name="Expenses" component={ExpensesScreen}
+              options={{ headerShown: true, title: 'Expenses', headerTintColor: BRAND }} />
           </>
         ) : (
           <Stack.Screen name="Login" component={LoginScreen} />
