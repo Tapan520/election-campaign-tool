@@ -35,7 +35,7 @@ export default function LoginScreen() {
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
         <View style={s.header}>
           <Ionicons name="bar-chart" size={60} color="#f59f00" />
-          <Text style={s.title}>Election Campaign Tool</Text>
+          <Text style={s.title}>Nirvachak AI</Text>
           <Text style={s.sub}>India MLA & Ward Election Management</Text>
         </View>
 
