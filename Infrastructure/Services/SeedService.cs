@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Nirvachak_AI.Domain.Entities;
 using Nirvachak_AI.Domain.Enums;
 using Nirvachak_AI.Infrastructure.Data;
@@ -14,7 +15,9 @@ public static class SeedService
         var userManager = scope.ServiceProvider.GetRequiredService<UserManager<AppUser>>();
         var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole>>();
 
-        await db.Database.EnsureCreatedAsync();
+        // Apply all pending EF migrations (creates DB + schema if it doesn't exist,
+        // or adds new tables like Announcements/AnnouncementAcknowledgements on redeploy)
+        await db.Database.MigrateAsync();
 
         foreach (var role in Enum.GetNames<UserRole>())
         {

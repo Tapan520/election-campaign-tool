@@ -132,19 +132,20 @@ builder.Services.AddRazorPages(options =>
 var app = builder.Build();
 
 // ?? Middleware Pipeline ???????????????????????????????????????
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(c =>
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Election Campaign Tool API v1"));
-}
-else
+// Always expose Swagger (useful for Railway health-check & mobile API docs)
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+    c.SwaggerEndpoint("/swagger/v1/swagger.json", "Election Campaign Tool API v1"));
+
+if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error");
     app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Railway terminates SSL at the load balancer — only redirect in local dev
+if (app.Environment.IsDevelopment())
+    app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseCors("AllowAll");
 app.UseRouting();
