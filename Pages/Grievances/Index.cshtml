@@ -1,5 +1,5 @@
-@page
-@model ElectionCampaignTool.Pages.Grievances.IndexModel
+ï»¿@page
+@model Nirvachak_AI.Pages.Grievances.IndexModel
 @{
     ViewData["Title"] = "Grievances";
 }
@@ -97,9 +97,9 @@
                                 @g.Status
                             </span>
                         </td>
-                        <td>@(g.Constituency?.Name ?? "—")</td>
-                        <td>@(g.Ward ?? "—")</td>
-                        <td>@(g.BoothNumber.HasValue ? $"#{g.BoothNumber}" : "—")</td>
+                        <td>@(g.Constituency?.Name ?? "ï¿½")</td>
+                        <td>@(g.Ward ?? "ï¿½")</td>
+                        <td>@(g.BoothNumber.HasValue ? $"#{g.BoothNumber}" : "ï¿½")</td>
                         <td class="small">@g.ReportedAt.ToString("dd MMM yy")</td>
                         <td>
                             <a asp-page="/Grievances/Details" asp-route-id="@g.Id" class="btn btn-sm btn-outline-primary py-0">

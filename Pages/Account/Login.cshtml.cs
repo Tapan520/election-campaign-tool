@@ -1,10 +1,10 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
-using ElectionCampaignTool.Domain.Entities;
+using Nirvachak_AI.Domain.Entities;
 
-namespace ElectionCampaignTool.Pages.Account;
+namespace Nirvachak_AI.Pages.Account;
 
 public class LoginModel : PageModel
 {

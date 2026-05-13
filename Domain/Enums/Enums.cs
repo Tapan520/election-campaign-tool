@@ -1,4 +1,4 @@
-namespace ElectionCampaignTool.Domain.Enums;
+﻿namespace Nirvachak_AI.Domain.Enums;
 
 public enum ElectionType { MLA, Ward }
 public enum VoterSentiment { Unknown, Favour, Against, Neutral, Floating }

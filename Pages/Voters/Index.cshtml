@@ -1,5 +1,5 @@
-@page
-@model ElectionCampaignTool.Pages.Voters.IndexModel
+ï»¿@page
+@model Nirvachak_AI.Pages.Voters.IndexModel
 @{
     ViewData["Title"] = "Voter List";
 }
@@ -108,7 +108,7 @@
                         </td>
                         <td>@v.Age / @v.Gender</td>
                         <td><span class="badge bg-secondary">@v.BoothNumber</span></td>
-                        <td>@(v.MobileNumber ?? "—")</td>
+                        <td>@(v.MobileNumber ?? "ï¿½")</td>
                         <td>
                             <span class="badge badge-@v.Sentiment.ToString().ToLower()">@v.Sentiment</span>
                         </td>
@@ -123,7 +123,7 @@
                             }
                             else
                             {
-                                <span class="badge bg-light text-muted">—</span>
+                                <span class="badge bg-light text-muted">ï¿½</span>
                             }
                         </td>
                         <td>

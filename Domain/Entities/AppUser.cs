@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Identity;
-using ElectionCampaignTool.Domain.Enums;
+﻿using Microsoft.AspNetCore.Identity;
+using Nirvachak_AI.Domain.Enums;
 
-namespace ElectionCampaignTool.Domain.Entities;
+namespace Nirvachak_AI.Domain.Entities;
 
 public class AppUser : IdentityUser
 {

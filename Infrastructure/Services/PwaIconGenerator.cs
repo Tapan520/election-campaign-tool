@@ -1,8 +1,8 @@
-namespace ElectionCampaignTool.Infrastructure.Services;
+ï»¿namespace Nirvachak_AI.Infrastructure.Services;
 
 /// <summary>
 /// Generates PWA icon PNG files at startup using pure C# (no System.Drawing,
-/// cross-platform — works on Railway Linux containers).
+/// cross-platform ï¿½ works on Railway Linux containers).
 /// </summary>
 public static class PwaIconGenerator
 {
@@ -139,7 +139,7 @@ public static class PwaIconGenerator
         ms.Write(lenBuf); ms.Write(typeBuf); ms.Write(data); ms.Write(crcBuf);
     }
 
-    // Deflate STORE (no compression) with zlib wrapper — valid for PNG IDAT
+    // Deflate STORE (no compression) with zlib wrapper ï¿½ valid for PNG IDAT
     private static byte[] DeflateStore(byte[] data)
     {
         const int BLK = 65535;

@@ -1,8 +1,8 @@
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
+﻿using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using ElectionCampaignTool.Domain.Entities;
+using Nirvachak_AI.Domain.Entities;
 
-namespace ElectionCampaignTool.Infrastructure.Data;
+namespace Nirvachak_AI.Infrastructure.Data;
 
 public class AppDbContext : IdentityDbContext<AppUser>
 {

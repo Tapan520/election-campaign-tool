@@ -1,10 +1,10 @@
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
 using Microsoft.IdentityModel.Tokens;
-using ElectionCampaignTool.Domain.Entities;
+using Nirvachak_AI.Domain.Entities;
 
-namespace ElectionCampaignTool.Infrastructure.Services;
+namespace Nirvachak_AI.Infrastructure.Services;
 
 public class JwtTokenService
 {

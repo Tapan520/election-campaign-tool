@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ElectionCampaignTool.Domain.Entities;
-using ElectionCampaignTool.Domain.Enums;
-using ElectionCampaignTool.Infrastructure.Data;
+using Nirvachak_AI.Domain.Entities;
+using Nirvachak_AI.Domain.Enums;
+using Nirvachak_AI.Infrastructure.Data;
 
-namespace ElectionCampaignTool.Pages.Expenses;
+namespace Nirvachak_AI.Pages.Expenses;
 
 public class IndexModel : PageModel
 {

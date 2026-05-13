@@ -1,13 +1,13 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+ï»¿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
-using ElectionCampaignTool.Hubs;
-using ElectionCampaignTool.Infrastructure.Data;
-using ElectionCampaignTool.Infrastructure.Services;
-using ElectionCampaignTool.Models.Api;
+using Nirvachak_AI.Hubs;
+using Nirvachak_AI.Infrastructure.Data;
+using Nirvachak_AI.Infrastructure.Services;
+using Nirvachak_AI.Models.Api;
 
-namespace ElectionCampaignTool.Controllers;
+namespace Nirvachak_AI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
@@ -45,7 +45,7 @@ public class ElectionDayController : ApiBaseController
         return Ok(new LiveTurnoutResponse(total, voted, pct, items));
     }
 
-    /// <summary>Mark a voter as voted (election day — booth agent)</summary>
+    /// <summary>Mark a voter as voted (election day ï¿½ booth agent)</summary>
     [HttpPost("mark-voted")]
     [ProducesResponseType(typeof(ApiResult), 200)]
     public async Task<IActionResult> MarkVoted([FromBody] MarkVotedRequest req)

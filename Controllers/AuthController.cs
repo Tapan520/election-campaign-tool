@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Authentication.JwtBearer;
+﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using ElectionCampaignTool.Domain.Entities;
-using ElectionCampaignTool.Infrastructure.Services;
-using ElectionCampaignTool.Models.Api;
+using Nirvachak_AI.Domain.Entities;
+using Nirvachak_AI.Infrastructure.Services;
+using Nirvachak_AI.Models.Api;
 
-namespace ElectionCampaignTool.Controllers;
+namespace Nirvachak_AI.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

@@ -1,12 +1,12 @@
-using Microsoft.AspNetCore.Identity;
+ï»¿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ElectionCampaignTool.Domain.Entities;
-using ElectionCampaignTool.Domain.Enums;
-using ElectionCampaignTool.Infrastructure.Data;
+using Nirvachak_AI.Domain.Entities;
+using Nirvachak_AI.Domain.Enums;
+using Nirvachak_AI.Infrastructure.Data;
 
-namespace ElectionCampaignTool.Pages.Surveys;
+namespace Nirvachak_AI.Pages.Surveys;
 
 public class IndexModel : PageModel
 {
@@ -59,7 +59,7 @@ public class IndexModel : PageModel
 
         int? cId = IsAdmin ? SelectedConstituencyId : user?.ConstituencyId;
 
-        // Load wards for drill-down (hidden for restricted roles — they only see their booth)
+        // Load wards for drill-down (hidden for restricted roles ï¿½ they only see their booth)
         if (cId.HasValue && !isRestricted)
             Wards = await _db.Wards.Where(w => w.ConstituencyId == cId.Value).OrderBy(w => w.WardNumber).ToListAsync();
 

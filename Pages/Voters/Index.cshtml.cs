@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Identity;
+ï»¿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ElectionCampaignTool.Domain.Entities;
-using ElectionCampaignTool.Domain.Enums;
-using ElectionCampaignTool.Infrastructure.Data;
+using Nirvachak_AI.Domain.Entities;
+using Nirvachak_AI.Domain.Enums;
+using Nirvachak_AI.Infrastructure.Data;
 
-namespace ElectionCampaignTool.Pages.Voters;
+namespace Nirvachak_AI.Pages.Voters;
 
 public class IndexModel : PageModel
 {
@@ -82,7 +82,7 @@ public class IndexModel : PageModel
             .Take(PageSize)
             .ToListAsync();
 
-        // Booth numbers for filter dropdown — scoped to selected constituency for Admin
+        // Booth numbers for filter dropdown ï¿½ scoped to selected constituency for Admin
         IQueryable<Voter> allVoters = _db.Voters.Where(v => !v.IsDeleted);
         if (IsAdmin)
         {

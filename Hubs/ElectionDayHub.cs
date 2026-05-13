@@ -1,6 +1,6 @@
-using Microsoft.AspNetCore.SignalR;
+﻿using Microsoft.AspNetCore.SignalR;
 
-namespace ElectionCampaignTool.Hubs;
+namespace Nirvachak_AI.Hubs;
 
 public class ElectionDayHub : Hub
 {

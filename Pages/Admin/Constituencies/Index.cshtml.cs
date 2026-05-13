@@ -1,11 +1,11 @@
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
-using ElectionCampaignTool.Domain.Entities;
-using ElectionCampaignTool.Infrastructure.Data;
+using Nirvachak_AI.Domain.Entities;
+using Nirvachak_AI.Infrastructure.Data;
 
-namespace ElectionCampaignTool.Pages.Admin.Constituencies;
+namespace Nirvachak_AI.Pages.Admin.Constituencies;
 
 [Authorize(Roles = "Admin")]
 public class IndexModel : PageModel

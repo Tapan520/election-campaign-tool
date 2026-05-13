@@ -1,12 +1,12 @@
-using System.Globalization;
+﻿using System.Globalization;
 using CsvHelper;
 using CsvHelper.Configuration;
 using Microsoft.EntityFrameworkCore;
-using ElectionCampaignTool.Domain.Entities;
-using ElectionCampaignTool.Domain.Enums;
-using ElectionCampaignTool.Infrastructure.Data;
+using Nirvachak_AI.Domain.Entities;
+using Nirvachak_AI.Domain.Enums;
+using Nirvachak_AI.Infrastructure.Data;
 
-namespace ElectionCampaignTool.Infrastructure.Services;
+namespace Nirvachak_AI.Infrastructure.Services;
 
 public class ImportResult
 {

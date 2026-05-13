@@ -1,7 +1,7 @@
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-namespace ElectionCampaignTool.Controllers;
+namespace Nirvachak_AI.Controllers;
 
 [Produces("application/json")]
 public abstract class ApiBaseController : ControllerBase

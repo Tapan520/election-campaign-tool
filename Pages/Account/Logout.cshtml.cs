@@ -1,9 +1,9 @@
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using ElectionCampaignTool.Domain.Entities;
+using Nirvachak_AI.Domain.Entities;
 
-namespace ElectionCampaignTool.Pages.Account;
+namespace Nirvachak_AI.Pages.Account;
 
 public class LogoutModel : PageModel
 {

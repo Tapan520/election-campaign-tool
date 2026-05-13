@@ -1,6 +1,6 @@
-# ??? Election Campaign Tool
+ï»¿# Nirvachak AI
 
-A full-stack **India MLA & Ward Election Management System** with a modern Web App and React Native Mobile App.
+**Nirvachak AI** â€” A full-stack **India MLA & Ward Election Management System** with a modern Web App and React Native Mobile App.
 
 ---
 
@@ -8,8 +8,8 @@ A full-stack **India MLA & Ward Election Management System** with a modern Web A
 
 | Layer | Technology |
 |---|---|
-| **Web Backend** | ASP.NET Core 8 — Razor Pages |
-| **REST API** | ASP.NET Core 8 — Web API + JWT Auth |
+| **Web Backend** | ASP.NET Core 8 ï¿½ Razor Pages |
+| **REST API** | ASP.NET Core 8 ï¿½ Web API + JWT Auth |
 | **Real-time** | SignalR (live election day turnout) |
 | **Database** | SQLite via Entity Framework Core 8 |
 | **Auth** | ASP.NET Core Identity + JWT Bearer |
@@ -64,7 +64,7 @@ npx expo start
 | Screen | Description |
 |---|---|
 | **Login** | JWT-secured authentication |
-| **Dashboard** | Live stats — voters, turnout, sentiment |
+| **Dashboard** | Live stats ï¿½ voters, turnout, sentiment |
 | **Voter List** | Search, filter, paginate 1000s of voters |
 | **Voter Detail** | Full profile, sentiment update, log door-to-door visits |
 | **Election Day** | Live turnout tracking, mark voter as voted |
@@ -85,7 +85,7 @@ npx expo start
 | **Volunteers** | Register, assign tasks, activate/deactivate |
 | **Election Day** | Live turnout dashboard with SignalR |
 | **Analytics** | Sentiment charts, age/gender breakdown |
-| **Grievances** | Track with priority — Open ? In Progress ? Resolved |
+| **Grievances** | Track with priority ï¿½ Open ? In Progress ? Resolved |
 | **Expenses** | EC-compliant expense tracking |
 | **Admin** | User management, roles, audit logs |
 
@@ -115,7 +115,7 @@ npx expo start
 ## ?? Project Structure
 
 ```
-ElectionCampaignTool/
+Nirvachak_AI/
 ??? Controllers/              # REST API controllers (JWT)
 ??? Domain/
 ?   ??? Entities/             # EF Core entity models

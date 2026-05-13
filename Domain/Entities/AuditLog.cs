@@ -1,4 +1,4 @@
-namespace ElectionCampaignTool.Domain.Entities;
+﻿namespace Nirvachak_AI.Domain.Entities;
 
 public class AuditLog
 {

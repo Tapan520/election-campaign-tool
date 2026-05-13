@@ -1,14 +1,14 @@
-using System.Text;
+ï»¿using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using ElectionCampaignTool.Domain.Entities;
-using ElectionCampaignTool.Domain.Enums;
-using ElectionCampaignTool.Hubs;
-using ElectionCampaignTool.Infrastructure.Data;
-using ElectionCampaignTool.Infrastructure.Services;
+using Nirvachak_AI.Domain.Entities;
+using Nirvachak_AI.Domain.Enums;
+using Nirvachak_AI.Hubs;
+using Nirvachak_AI.Infrastructure.Data;
+using Nirvachak_AI.Infrastructure.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,7 +97,7 @@ builder.Services.AddSwaggerGen(c =>
     {
         Title = "Election Campaign Tool API",
         Version = "v1",
-        Description = "REST API for Web & Mobile App — India MLA & Ward Elections"
+        Description = "REST API for Web & Mobile App ï¿½ India MLA & Ward Elections"
     });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -165,7 +165,7 @@ app.MapGet("/api/ElectionDayStats", async (int constituencyId, AppDbContext db) 
 // ?? Seed Data ?????????????????????????????????????????????????
 await SeedService.SeedAsync(app.Services);
 
-// ?? PWA Icons — generated at startup (cross-platform, no external libs) ??
+// ?? PWA Icons ï¿½ generated at startup (cross-platform, no external libs) ??
 var wwwroot = app.Environment.WebRootPath
     ?? Path.Combine(app.Environment.ContentRootPath, "wwwroot");
 PwaIconGenerator.EnsureIconsExist(wwwroot);

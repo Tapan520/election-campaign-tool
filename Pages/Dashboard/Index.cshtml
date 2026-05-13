@@ -1,5 +1,5 @@
-@page
-@model ElectionCampaignTool.Pages.Dashboard.IndexModel
+ï»¿@page
+@model Nirvachak_AI.Pages.Dashboard.IndexModel
 @{
     ViewData["Title"] = "Dashboard";
     var anyFilter = Model.SelectedConstituencyId.HasValue
@@ -11,7 +11,7 @@
 @if (Model.IsAdmin || Model.Wards.Any())
 {
     <form method="get" class="d-flex flex-wrap align-items-center gap-2 mb-4 p-3 bg-body-tertiary rounded border">
-        @* Constituency — Admin only *@
+        @* Constituency ï¿½ Admin only *@
         @if (Model.IsAdmin)
         {
             <div class="d-flex align-items-center gap-1">
@@ -19,7 +19,7 @@
                 <select name="SelectedConstituencyId" id="selConstituency"
                         class="form-select form-select-sm" style="min-width:200px"
                         onchange="clearChildren(['selWard','selBooth']); this.form.submit();">
-                    <option value="">— All —</option>
+                    <option value="">ï¿½ All ï¿½</option>
                     @foreach (var c in Model.Constituencies)
                     {
                         <option value="@c.Id" selected="@(Model.SelectedConstituencyId == c.Id)">@c.Name</option>
@@ -37,7 +37,7 @@
                 <select name="SelectedWard" id="selWard"
                         class="form-select form-select-sm" style="min-width:185px"
                         onchange="clearChildren(['selBooth']); this.form.submit();">
-                    <option value="">— All Wards —</option>
+                    <option value="">ï¿½ All Wards ï¿½</option>
                     @foreach (var w in Model.Wards)
                     {
                         <option value="@w.WardNumber" selected="@(Model.SelectedWard == w.WardNumber)">@w.WardName</option>
@@ -51,7 +51,7 @@
             }
         }
 
-        @* Booth — appears once a ward is selected and booths exist *@
+        @* Booth ï¿½ appears once a ward is selected and booths exist *@
         @if (Model.BoothOptions.Any())
         {
             <i class="bi bi-chevron-right text-muted small"></i>
@@ -60,11 +60,11 @@
                 <select name="SelectedBoothNumber" id="selBooth"
                         class="form-select form-select-sm" style="min-width:170px"
                         onchange="this.form.submit();">
-                    <option value="">— All Booths —</option>
+                    <option value="">ï¿½ All Booths ï¿½</option>
                     @foreach (var b in Model.BoothOptions)
                     {
                         <option value="@b.BoothNumber" selected="@(Model.SelectedBoothNumber == b.BoothNumber)">
-                            #@b.BoothNumber – @b.BoothName
+                            #@b.BoothNumber ï¿½ @b.BoothName
                         </option>
                     }
                 </select>
@@ -230,7 +230,7 @@ else if (!string.IsNullOrEmpty(Model.ActiveConstituencyName))
                         <div class="badge bg-primary rounded-circle p-2"><i class="bi bi-calendar3"></i></div>
                         <div>
                             <div class="small fw-semibold">@ev.Title</div>
-                            <div class="text-muted" style="font-size:0.75rem">@ev.ScheduledAt.ToString("dd MMM, h:mm tt") — @ev.Location</div>
+                            <div class="text-muted" style="font-size:0.75rem">@ev.ScheduledAt.ToString("dd MMM, h:mm tt") ï¿½ @ev.Location</div>
                         </div>
                     </div>
                 }

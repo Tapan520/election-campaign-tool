@@ -4,7 +4,9 @@
     <TargetFramework>net8.0</TargetFramework>
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
-    <UserSecretsId>election-campaign-tool-secrets</UserSecretsId>
+    <AssemblyName>Nirvachak_AI</AssemblyName>
+    <RootNamespace>Nirvachak_AI</RootNamespace>
+    <UserSecretsId>nirvachak-ai-secrets</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>

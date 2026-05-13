@@ -1,5 +1,5 @@
-@page
-@model ElectionCampaignTool.Pages.ElectionDay.IndexModel
+ï»¿@page
+@model Nirvachak_AI.Pages.ElectionDay.IndexModel
 @{
     ViewData["Title"] = "Election Day - Live Tracking";
 }
@@ -73,7 +73,7 @@
                     @foreach (var v in Model.TodayVoters)
                     {
                         <option value="@v.Id" data-name="@v.Name" data-epic="@v.VoterId">
-                            [@v.VoterId] @v.Name — Booth @v.BoothNumber (@v.ElectionDayStatus)
+                            [@v.VoterId] @v.Name ï¿½ Booth @v.BoothNumber (@v.ElectionDayStatus)
                         </option>
                     }
                 </select>

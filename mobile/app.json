@@ -1,16 +1,16 @@
 {
   "expo": {
-    "name": "Election Campaign Tool",
-    "slug": "election-campaign-mobile",
+    "name": "Nirvachak AI",
+    "slug": "nirvachak-ai-mobile",
     "version": "1.0.0",
     "orientation": "portrait",
-    "scheme": "electioncampaign",
+    "scheme": "nirvachak",
     "newArchEnabled": false,
     "android": {
-      "package": "com.india.electioncampaign"
+      "package": "com.india.nirvachak"
     },
     "ios": {
-      "bundleIdentifier": "com.india.electioncampaign"
+      "bundleIdentifier": "com.india.nirvachak"
     },
     "extra": {
       "eas": {

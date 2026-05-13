@@ -1,5 +1,5 @@
 ﻿@using Microsoft.AspNetCore.Identity
-@using ElectionCampaignTool.Domain.Entities
+@using Nirvachak_AI.Domain.Entities
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
 <!DOCTYPE html>
@@ -51,7 +51,7 @@
                             <i class="bi bi-people-fill me-2"></i> Voter List
                         </a>
                     </li>
-                    @if (currentUser?.Role != ElectionCampaignTool.Domain.Enums.UserRole.FieldWorker && currentUser?.Role != ElectionCampaignTool.Domain.Enums.UserRole.BoothAgent)
+                    @if (currentUser?.Role != Nirvachak_AI.Domain.Enums.UserRole.FieldWorker && currentUser?.Role != Nirvachak_AI.Domain.Enums.UserRole.BoothAgent)
                     {
                     <li class="nav-item">
                         <a class="nav-link sidebar-link @(currentPage == "/Voters/Import" ? "active" : "")" asp-page="/Voters/Import">
@@ -91,7 +91,7 @@
                             <i class="bi bi-bar-chart-line-fill me-2"></i> Analytics
                         </a>
                     </li>
-                    @if (currentUser?.Role != ElectionCampaignTool.Domain.Enums.UserRole.FieldWorker && currentUser?.Role != ElectionCampaignTool.Domain.Enums.UserRole.BoothAgent)
+                    @if (currentUser?.Role != Nirvachak_AI.Domain.Enums.UserRole.FieldWorker && currentUser?.Role != Nirvachak_AI.Domain.Enums.UserRole.BoothAgent)
                     {
                     <li class="nav-item">
                         <a class="nav-link sidebar-link @(currentPage.StartsWith("/Grievances") ? "active" : "")" asp-page="/Grievances/Index">
@@ -99,7 +99,7 @@
                         </a>
                     </li>
                     }
-                    @if (currentUser?.Role != ElectionCampaignTool.Domain.Enums.UserRole.FieldWorker && currentUser?.Role != ElectionCampaignTool.Domain.Enums.UserRole.BoothAgent)
+                    @if (currentUser?.Role != Nirvachak_AI.Domain.Enums.UserRole.FieldWorker && currentUser?.Role != Nirvachak_AI.Domain.Enums.UserRole.BoothAgent)
                     {
                     <li class="nav-item">
                         <a class="nav-link sidebar-link @(currentPage.StartsWith("/Expenses") ? "active" : "")" asp-page="/Expenses/Index">

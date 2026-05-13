@@ -1,7 +1,7 @@
-using QRCoder;
-using ElectionCampaignTool.Domain.Entities;
+﻿using QRCoder;
+using Nirvachak_AI.Domain.Entities;
 
-namespace ElectionCampaignTool.Infrastructure.Services;
+namespace Nirvachak_AI.Infrastructure.Services;
 
 public class VoterSlipService
 {

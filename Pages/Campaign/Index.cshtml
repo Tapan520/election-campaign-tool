@@ -1,5 +1,5 @@
-@page
-@model ElectionCampaignTool.Pages.Campaign.IndexModel
+ï»¿@page
+@model Nirvachak_AI.Pages.Campaign.IndexModel
 @{
     ViewData["Title"] = "Campaign Events";
 }
@@ -50,7 +50,7 @@
                         <td><span class="badge bg-info text-dark">@ev.EventType</span></td>
                         <td>@ev.ScheduledAt.ToString("dd MMM yy, h:mm tt")</td>
                         <td>@ev.Location</td>
-                        <td>@(ev.ExpectedAttendance?.ToString() ?? "—")</td>
+                        <td>@(ev.ExpectedAttendance?.ToString() ?? "ï¿½")</td>
                         <td>
                             @if (ev.IsCompleted)
                             {

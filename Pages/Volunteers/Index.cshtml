@@ -1,5 +1,5 @@
-@page
-@model ElectionCampaignTool.Pages.Volunteers.IndexModel
+ï»¿@page
+@model Nirvachak_AI.Pages.Volunteers.IndexModel
 @{
     ViewData["Title"] = "Volunteers";
 }
@@ -47,8 +47,8 @@
                         </td>
                         <td>@v.Phone</td>
                         <td><span class="badge bg-info text-dark">@v.Task</span></td>
-                        <td>@(v.AssignedArea ?? "—")</td>
-                        <td>@(v.AssignedBoothNumbers ?? "—")</td>
+                        <td>@(v.AssignedArea ?? "ï¿½")</td>
+                        <td>@(v.AssignedBoothNumbers ?? "ï¿½")</td>
                         <td>
                             <span class="badge @(v.IsActive ? "bg-success" : "bg-secondary")">
                                 @(v.IsActive ? "Active" : "Inactive")

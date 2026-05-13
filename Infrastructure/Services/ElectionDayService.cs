@@ -1,8 +1,8 @@
-using Microsoft.EntityFrameworkCore;
-using ElectionCampaignTool.Domain.Enums;
-using ElectionCampaignTool.Infrastructure.Data;
+﻿using Microsoft.EntityFrameworkCore;
+using Nirvachak_AI.Domain.Enums;
+using Nirvachak_AI.Infrastructure.Data;
 
-namespace ElectionCampaignTool.Infrastructure.Services;
+namespace Nirvachak_AI.Infrastructure.Services;
 
 public class BoothTurnoutDto
 {
