@@ -208,3 +208,28 @@ public record PagedResult<T>(
     int Page,
     int PageSize,
     int TotalPages);
+
+// ?? Announcements ?????????????????????????????????????????????
+public record AnnouncementListItem(
+    int Id,
+    string Title,
+    string Body,
+    string Category,
+    string CategoryLabel,
+    string CategoryColor,
+    string CreatedByName,
+    string TargetRoles,
+    bool IsPinned,
+    bool RequiresAcknowledgement,
+    bool IsAcknowledged,
+    int AcknowledgementCount,
+    DateTime? ExpiresAt,
+    DateTime CreatedAt);
+
+public record CreateAnnouncementRequest(
+    string Title,
+    string Body,
+    string Category,
+    string? TargetRoles,
+    bool RequiresAcknowledgement,
+    DateTime? ExpiresAt);

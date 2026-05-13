@@ -4,8 +4,10 @@ import {
   TouchableOpacity, ActivityIndicator, Dimensions,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useNavigation } from '@react-navigation/native';
 import { useAuth } from '../context/AuthContext';
 import { getDashboardStats, DashboardStats } from '../api/dashboard';
+import { AnnouncementItem, CATEGORY_HEX, CATEGORY_ICONS, getAnnouncements, acknowledgeAnnouncement } from '../api/announcements';
 
 const CARD_WIDTH = (Dimensions.get('window').width - 48) / 2;
 
@@ -28,24 +30,40 @@ function StatCard({ icon, label, value, color }: StatCardProps) {
 }
 
 export default function DashboardScreen() {
-  const { user, logout } = useAuth();
-  const [stats, setStats] = useState<DashboardStats | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [refreshing, setRefreshing] = useState(false);
+const { user, logout } = useAuth();
+const nav = useNavigation<any>();
+const [stats,         setStats]         = useState<DashboardStats | null>(null);
+const [announcements, setAnnouncements] = useState<AnnouncementItem[]>([]);
+const [loading,       setLoading]       = useState(true);
+const [refreshing,    setRefreshing]    = useState(false);
 
-  const load = useCallback(async () => {
-    try { setStats(await getDashboardStats()); }
-    catch { /* offline — keep old data */ }
-    finally { setLoading(false); setRefreshing(false); }
-  }, []);
+const load = useCallback(async () => {
+  try {
+    const [s, a] = await Promise.all([getDashboardStats(), getAnnouncements()]);
+    setStats(s);
+    setAnnouncements(a);
+  }
+  catch { /* offline — keep old data */ }
+  finally { setLoading(false); setRefreshing(false); }
+}, []);
 
-  useEffect(() => { load(); }, [load]);
+useEffect(() => { load(); }, [load]);
 
   if (loading) {
     return <View style={s.center}><ActivityIndicator color="#3b5bdb" size="large" /></View>;
   }
 
-  const firstName = user?.fullName?.split(' ')[0] ?? 'User';
+  const firstName   = user?.fullName?.split(' ')[0] ?? 'User';
+  const pinned      = announcements.filter(a => a.isPinned);
+  const recent      = announcements.filter(a => !a.isPinned).slice(0, 3);
+  const unreadCount = announcements.filter(a => a.requiresAcknowledgement && !a.isAcknowledged).length;
+
+  const handleAck = async (id: number) => {
+    try {
+      await acknowledgeAnnouncement(id);
+      setAnnouncements(prev => prev.map(a => a.id === id ? { ...a, isAcknowledged: true } : a));
+    } catch {}
+  };
 
   return (
     <ScrollView
@@ -64,6 +82,35 @@ export default function DashboardScreen() {
           <Ionicons name="log-out-outline" size={22} color="#fff" />
         </TouchableOpacity>
       </View>
+
+      {/* ── Pinned Critical Alerts ── */}
+      {pinned.map(a => (
+        <View key={a.id} style={s.criticalBanner}>
+          <View style={s.criticalRow}>
+            <Ionicons name="warning" size={18} color="#fff" />
+            <View style={{ flex: 1, marginLeft: 10 }}>
+              <Text style={s.criticalTitle}>{a.title}</Text>
+              <Text style={s.criticalBody} numberOfLines={2}>{a.body}</Text>
+            </View>
+          </View>
+          {a.requiresAcknowledgement && !a.isAcknowledged && (
+            <TouchableOpacity style={s.criticalAckBtn} onPress={() => handleAck(a.id)}>
+              <Text style={s.criticalAckTxt}>Acknowledge</Text>
+            </TouchableOpacity>
+          )}
+        </View>
+      ))}
+
+      {/* ── Unread acknowledgement nudge ── */}
+      {unreadCount > 0 && (
+        <TouchableOpacity style={s.unreadBanner} onPress={() => nav.navigate('Announcements')}>
+          <Ionicons name="notifications" size={16} color="#e67700" />
+          <Text style={s.unreadTxt}>
+            {unreadCount} announcement{unreadCount > 1 ? 's' : ''} need your acknowledgement
+          </Text>
+          <Ionicons name="chevron-forward" size={16} color="#e67700" />
+        </TouchableOpacity>
+      )}
 
       {/* ── Turnout Banner ── */}
       <View style={s.banner}>
@@ -106,7 +153,7 @@ export default function DashboardScreen() {
 
       {/* ── Voted vs Not Voted ── */}
       <Text style={s.sectionTitle}>Election Day Status</Text>
-      <View style={[s.sentimentRow, { marginBottom: 28 }]}>
+      <View style={[s.sentimentRow, { marginBottom: 16 }]}>
         {[
           { label: 'Voted',     val: stats?.totalVoted ?? 0,
             color: '#2f9e44' },
@@ -120,6 +167,47 @@ export default function DashboardScreen() {
             <Text style={s.sentimentLbl}>{label}</Text>
           </View>
         ))}
+      </View>
+
+      {/* ── Recent Announcements ── */}
+      <View style={s.annHeader}>
+        <Text style={s.sectionTitle}>Recent Announcements</Text>
+        <TouchableOpacity onPress={() => nav.navigate('Announcements')}>
+          <Text style={s.seeAll}>View All</Text>
+        </TouchableOpacity>
+      </View>
+      <View style={[s.sentimentRow, { flexDirection: 'column', padding: 0, marginBottom: 28, overflow: 'hidden' }]}>
+        {recent.length === 0 ? (
+          <Text style={{ color: '#adb5bd', padding: 16, textAlign: 'center', fontSize: 13 }}>No announcements yet.</Text>
+        ) : recent.map((a, idx) => {
+          const hex  = CATEGORY_HEX[a.categoryColor] ?? '#868e96';
+          const icon = CATEGORY_ICONS[a.category] ?? 'megaphone';
+          return (
+            <View key={a.id} style={[s.annRow, idx < recent.length - 1 && s.annRowBorder]}>
+              <View style={[s.annIcon, { backgroundColor: hex + '22' }]}>
+                <Ionicons name={icon as any} size={14} color={hex} />
+              </View>
+              <View style={{ flex: 1 }}>
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, flexWrap: 'wrap' }}>
+                  <View style={[s.catPill, { backgroundColor: hex + '22' }]}>
+                    <Text style={[s.catPillTxt, { color: hex }]}>{a.categoryLabel}</Text>
+                  </View>
+                  {a.requiresAcknowledgement && !a.isAcknowledged && (
+                    <View style={s.actionPill}>
+                      <Text style={s.actionPillTxt}>Action needed</Text>
+                    </View>
+                  )}
+                </View>
+                <Text style={s.annTitle} numberOfLines={1}>{a.title}</Text>
+                <Text style={s.annMeta}>{a.createdByName}</Text>
+              </View>
+            </View>
+          );
+        })}
+        <TouchableOpacity style={s.annFooter} onPress={() => nav.navigate('Announcements')}>
+          <Ionicons name="add-circle-outline" size={16} color="#3b5bdb" />
+          <Text style={s.annFooterTxt}>Post New Announcement</Text>
+        </TouchableOpacity>
       </View>
     </ScrollView>
   );
@@ -167,4 +255,37 @@ const s = StyleSheet.create({
   sentimentItem:{ flex: 1, alignItems: 'center' },
   sentimentVal: { fontSize: 22, fontWeight: '800' },
   sentimentLbl: { fontSize: 11, color: '#868e96', marginTop: 2 },
+
+  /* Critical alerts */
+  criticalBanner: { backgroundColor: '#e03131', marginHorizontal: 16, marginTop: 12,
+                    borderRadius: 14, padding: 14 },
+  criticalRow:  { flexDirection: 'row', alignItems: 'flex-start' },
+  criticalTitle:{ color: '#fff', fontWeight: '700', fontSize: 14, marginBottom: 3 },
+  criticalBody: { color: 'rgba(255,255,255,0.85)', fontSize: 12, lineHeight: 17 },
+  criticalAckBtn:{ marginTop: 10, alignSelf: 'flex-end', backgroundColor: 'rgba(255,255,255,0.2)',
+                   borderRadius: 8, paddingHorizontal: 14, paddingVertical: 6 },
+  criticalAckTxt:{ color: '#fff', fontWeight: '700', fontSize: 13 },
+
+  /* Unread nudge */
+  unreadBanner: { flexDirection: 'row', alignItems: 'center', gap: 8,
+                  backgroundColor: '#fff3bf', marginHorizontal: 16, marginTop: 10,
+                  borderRadius: 12, paddingHorizontal: 14, paddingVertical: 10 },
+  unreadTxt:    { flex: 1, color: '#e67700', fontSize: 13, fontWeight: '600' },
+
+  /* Announcements widget */
+  annHeader:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
+                  marginHorizontal: 16, marginTop: 12, marginBottom: 8 },
+  seeAll:       { fontSize: 13, color: '#3b5bdb', fontWeight: '600' },
+  annRow:       { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14 },
+  annRowBorder: { borderBottomWidth: 1, borderBottomColor: '#f1f3f5' },
+  annIcon:      { width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
+  catPill:      { borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
+  catPillTxt:   { fontSize: 10, fontWeight: '700' },
+  actionPill:   { backgroundColor: '#fff3bf', borderRadius: 6, paddingHorizontal: 7, paddingVertical: 2 },
+  actionPillTxt:{ fontSize: 10, fontWeight: '700', color: '#e67700' },
+  annTitle:     { fontSize: 13, fontWeight: '700', color: '#212529', marginTop: 3 },
+  annMeta:      { fontSize: 11, color: '#adb5bd', marginTop: 2 },
+  annFooter:    { flexDirection: 'row', alignItems: 'center', justifyContent: 'center',
+                  gap: 6, padding: 14, borderTopWidth: 1, borderTopColor: '#f1f3f5' },
+  annFooterTxt: { color: '#3b5bdb', fontSize: 13, fontWeight: '600' },
 });
