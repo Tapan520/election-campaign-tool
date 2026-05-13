@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Nirvachak_AI.Domain.Entities;
 using Nirvachak_AI.Domain.Enums;
 using Nirvachak_AI.Infrastructure.Data;
+using Nirvachak_AI.Pages.Announcements;
 
 namespace Nirvachak_AI.Pages.Dashboard;
 
@@ -48,6 +49,9 @@ public class IndexModel : PageModel
     public Dictionary<string, int> SentimentBreakdown { get; set; } = new();
     public List<Booth> BoothSummary { get; set; } = new();
     public List<CampaignEvent> UpcomingEvents { get; set; } = new();
+    public List<AnnouncementViewModel> CriticalAlerts { get; set; } = new();
+    public List<AnnouncementViewModel> RecentAnnouncements { get; set; } = new();
+    public int UnacknowledgedCount { get; set; }
 
     public async Task OnGetAsync()
     {
@@ -141,6 +145,35 @@ public class IndexModel : PageModel
         {
             var found = sentimentCounts.FirstOrDefault(x => x.Sentiment == s);
             SentimentBreakdown[s.ToString()] = found?.Count ?? 0;
+        }
+
+        // ?? Announcements ????????????????????????????????????????????????????????????
+        if (user != null)
+        {
+            var now = DateTime.UtcNow;
+            var roleStr = user.Role.ToString();
+            var annQuery = _db.Announcements
+                .Include(a => a.Acknowledgements)
+                .Where(a => a.IsActive && (a.ExpiresAt == null || a.ExpiresAt > now)
+                    && (a.ConstituencyId == null || a.ConstituencyId == user.ConstituencyId || IsAdmin)
+                    && (a.TargetRoles == "All" || a.TargetRoles.Contains(roleStr) || a.CreatedByUserId == user.Id));
+
+            var annList = await annQuery
+                .OrderByDescending(a => a.IsPinned)
+                .ThenByDescending(a => a.CreatedAt)
+                .Take(20)
+                .ToListAsync();
+
+            var mapped = annList.Select(a => new AnnouncementViewModel
+            {
+                Announcement = a,
+                IsAcknowledged = a.Acknowledgements.Any(x => x.UserId == user.Id),
+                AcknowledgementCount = a.Acknowledgements.Count
+            }).ToList();
+
+            CriticalAlerts = mapped.Where(v => v.Announcement.IsPinned).ToList();
+            RecentAnnouncements = mapped.Where(v => !v.Announcement.IsPinned).Take(5).ToList();
+            UnacknowledgedCount = mapped.Count(v => v.Announcement.RequiresAcknowledgement && !v.IsAcknowledged);
         }
     }
 }

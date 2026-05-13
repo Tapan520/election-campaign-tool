@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using Nirvachak_AI.Domain.Entities;
 using Nirvachak_AI.Domain.Enums;
 using Nirvachak_AI.Infrastructure.Data;
+using Nirvachak_AI.Infrastructure.Services;
 
 namespace Nirvachak_AI.Pages.Admin;
 
@@ -14,11 +15,13 @@ public class IndexModel : PageModel
 {
     private readonly AppDbContext _db;
     private readonly UserManager<AppUser> _userManager;
+    private readonly AuditService _audit;
 
-    public IndexModel(AppDbContext db, UserManager<AppUser> userManager)
+    public IndexModel(AppDbContext db, UserManager<AppUser> userManager, AuditService audit)
     {
         _db = db;
         _userManager = userManager;
+        _audit = audit;
     }
 
     public List<AppUser> Users { get; set; } = new();
@@ -61,6 +64,13 @@ public class IndexModel : PageModel
 
             user.IsActive = !user.IsActive;
             await _userManager.UpdateAsync(user);
+
+            await _audit.LogAsync(
+                currentUser!.Id, currentUser.FullName,
+                user.IsActive ? "EnableUser" : "DisableUser", "AppUser", userId,
+                $"User '{user.FullName}' ({user.Email}) {(user.IsActive ? "enabled" : "disabled")}",
+                currentUser.ConstituencyId);
+
             TempData["Message"] = $"User {user.FullName} has been {(user.IsActive ? "enabled" : "disabled")}.";
         }
         return RedirectToPage();

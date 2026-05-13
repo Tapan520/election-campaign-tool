@@ -1,7 +1,9 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.EntityFrameworkCore
 @using Nirvachak_AI.Domain.Entities
 @inject SignInManager<AppUser> SignInManager
 @inject UserManager<AppUser> UserManager
+@inject Nirvachak_AI.Infrastructure.Data.AppDbContext LayoutDb
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -26,6 +28,19 @@
 {
     var currentUser = await UserManager.GetUserAsync(User);
     var currentPage = ViewContext.RouteData.Values["page"]?.ToString() ?? "";
+    int annUnread = 0;
+    if (currentUser != null)
+    {
+        var roleStr = currentUser.Role.ToString();
+        var now = DateTime.UtcNow;
+        annUnread = await LayoutDb.Announcements.CountAsync(a =>
+            a.IsActive
+            && a.RequiresAcknowledgement
+            && (a.ExpiresAt == null || a.ExpiresAt > now)
+            && (a.ConstituencyId == null || a.ConstituencyId == currentUser.ConstituencyId)
+            && (a.TargetRoles == "All" || a.TargetRoles.Contains(roleStr))
+            && !LayoutDb.AnnouncementAcknowledgements.Any(ack => ack.AnnouncementId == a.Id && ack.UserId == currentUser.Id));
+    }
     <div class="d-flex" id="wrapper">
         <!-- Sidebar -->
         <nav id="sidebar" class="sidebar d-flex flex-column">
@@ -81,6 +96,15 @@
                         </a>
                     </li>
                     <li class="sidebar-section-label px-2 mt-3 mb-1">OPERATIONS</li>
+                    <li class="nav-item">
+                        <a class="nav-link sidebar-link @(currentPage.StartsWith("/Announcements") ? "active" : "")" asp-page="/Announcements/Index">
+                            <i class="bi bi-megaphone-fill me-2"></i> Announcements
+                            @if (annUnread > 0)
+                            {
+                                <span class="badge bg-warning text-dark ms-auto">@annUnread</span>
+                            }
+                        </a>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link sidebar-link @(currentPage.StartsWith("/ElectionDay") ? "active" : "")" asp-page="/ElectionDay/Index">
                             <i class="bi bi-activity me-2"></i> Election Day

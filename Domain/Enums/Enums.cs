@@ -11,3 +11,4 @@ public enum ElectionDayStatus { NotVoted, Voted, Absent }
 public enum CampaignEventType { Rally, DoorToDoor, SmallMeeting, LargeMeeting, PhoneCall, Other }
 public enum VolunteerTask { BoothManagement, VoterOutreach, DataEntry, Transport, Communication, Other }
 public enum SurveyCategory { CandidateAwareness, LocalIssues, PartySupport, DevelopmentFeedback, GeneralOpinion }
+public enum AnnouncementCategory { CampaignAnnouncement, CriticalAlert, ECComplianceNotice, DailyBriefing, Motivation, LiveDataNudge }

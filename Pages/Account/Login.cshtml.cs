@@ -3,16 +3,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using System.ComponentModel.DataAnnotations;
 using Nirvachak_AI.Domain.Entities;
+using Nirvachak_AI.Infrastructure.Services;
 
 namespace Nirvachak_AI.Pages.Account;
 
 public class LoginModel : PageModel
 {
     private readonly SignInManager<AppUser> _signInManager;
+    private readonly UserManager<AppUser> _userManager;
+    private readonly AuditService _audit;
 
-    public LoginModel(SignInManager<AppUser> signInManager)
+    public LoginModel(SignInManager<AppUser> signInManager, UserManager<AppUser> userManager, AuditService audit)
     {
         _signInManager = signInManager;
+        _userManager   = userManager;
+        _audit         = audit;
     }
 
     [BindProperty]
@@ -45,7 +50,18 @@ public class LoginModel : PageModel
             Input.Email, Input.Password, Input.RememberMe, lockoutOnFailure: false);
 
         if (result.Succeeded)
+        {
+            var user = await _userManager.FindByEmailAsync(Input.Email);
+            if (user != null)
+                await _audit.LogAsync(user.Id, user.FullName, "Login", "Session",
+                    details: $"Login from {HttpContext.Connection.RemoteIpAddress}",
+                    constituencyId: user.ConstituencyId);
+
             return LocalRedirect(returnUrl ?? "/Dashboard/Index");
+        }
+
+        await _audit.LogAsync("unknown", Input.Email, "LoginFailed", "Session",
+            details: $"Failed login attempt for {Input.Email}");
 
         ErrorMessage = "Invalid email or password.";
         return Page();

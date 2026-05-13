@@ -20,6 +20,8 @@ public class AppDbContext : IdentityDbContext<AppUser>
     public DbSet<Ward> Wards => Set<Ward>();
     public DbSet<Survey> Surveys => Set<Survey>();
     public DbSet<SurveyResponse> SurveyResponses => Set<SurveyResponse>();
+    public DbSet<Announcement> Announcements => Set<Announcement>();
+    public DbSet<AnnouncementAcknowledgement> AnnouncementAcknowledgements => Set<AnnouncementAcknowledgement>();
 
     protected override void OnModelCreating(ModelBuilder builder)
     {
@@ -32,6 +34,10 @@ public class AppDbContext : IdentityDbContext<AppUser>
         builder.Entity<Expense>()
             .Property(e => e.Amount)
             .HasColumnType("decimal(18,2)");
+
+        builder.Entity<AnnouncementAcknowledgement>()
+            .HasIndex(a => new { a.AnnouncementId, a.UserId })
+            .IsUnique();
 
         builder.Entity<AppUser>()
             .HasOne(u => u.Constituency)

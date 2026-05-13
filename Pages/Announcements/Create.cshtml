@@ -1,0 +1,155 @@
+@page
+@using Nirvachak_AI.Domain.Enums
+@using Nirvachak_AI.Pages.Announcements
+@model Nirvachak_AI.Pages.Announcements.CreateModel
+@{
+    ViewData["Title"] = "New Announcement";
+    var categories = Enum.GetValues<AnnouncementCategory>();
+}
+
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-header d-flex align-items-center gap-2">
+                <i class="bi bi-megaphone-fill text-primary fs-5"></i>
+                <span class="fw-semibold">Post a New Announcement</span>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger py-2 small"></div>
+
+                    @* Category *@
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Category <span class="text-danger">*</span></label>
+                        <div class="row g-2">
+                            @foreach (var cat in categories)
+                            {
+                                var dummy = new Nirvachak_AI.Domain.Entities.Announcement { Category = cat };
+                                <div class="col-6 col-md-4">
+                                    <input type="radio" class="btn-check" name="Input.Category"
+                                           id="cat_@cat" value="@((int)cat)"
+                                           checked="@(Model.Input.Category == cat)"
+                                           onchange="updateCategoryHints()">
+                                    <label class="btn btn-outline-@dummy.CategoryColor w-100 text-start" for="cat_@cat">
+                                        <i class="bi @dummy.CategoryIcon me-2"></i>@dummy.CategoryLabel
+                                    </label>
+                                </div>
+                            }
+                        </div>
+                        <div id="categoryHint" class="form-text mt-2"></div>
+                    </div>
+
+                    @* Title *@
+                    <div class="mb-3">
+                        <label asp-for="Input.Title" class="form-label fw-semibold">Title <span class="text-danger">*</span></label>
+                        <input asp-for="Input.Title" class="form-control" placeholder="Short, clear headline..." maxlength="200" />
+                        <span asp-validation-for="Input.Title" class="text-danger small"></span>
+                    </div>
+
+                    @* Body *@
+                    <div class="mb-3">
+                        <label asp-for="Input.Body" class="form-label fw-semibold">Message <span class="text-danger">*</span></label>
+                        <textarea asp-for="Input.Body" class="form-control" rows="5"
+                                  placeholder="Write your announcement here..."></textarea>
+                        <span asp-validation-for="Input.Body" class="text-danger small"></span>
+                    </div>
+
+                    @* Target Roles *@
+                    <div class="mb-3">
+                        <label class="form-label fw-semibold">Send To</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox" id="roleAll" value=""
+                                       onchange="toggleAllRoles(this)">
+                                <label class="form-check-label fw-semibold" for="roleAll">All roles</label>
+                            </div>
+                            @foreach (var role in Model.AllowedTargetRoles)
+                            {
+                                <div class="form-check form-check-inline">
+                                    <input class="form-check-input role-check" type="checkbox"
+                                           name="Input.SelectedRoles"
+                                           id="role_@role" value="@role">
+                                    <label class="form-check-label" for="role_@role">@role</label>
+                                </div>
+                            }
+                        </div>
+                        <div class="form-text">Leave all unchecked to broadcast to all permitted roles.</div>
+                    </div>
+
+                    @* Constituency (Admin only) *@
+                    @if (Model.IsAdmin)
+                    {
+                        <div class="mb-3">
+                            <label asp-for="Input.ConstituencyId" class="form-label fw-semibold">Constituency</label>
+                            <select asp-for="Input.ConstituencyId" class="form-select">
+                                <option value="">— All Constituencies —</option>
+                                @foreach (var c in Model.Constituencies)
+                                {
+                                    <option value="@c.Id">@c.Name</option>
+                                }
+                            </select>
+                        </div>
+                    }
+
+                    @* Expiry *@
+                    <div class="mb-3">
+                        <label asp-for="Input.ExpiresAt" class="form-label fw-semibold">Auto-expire at</label>
+                        <input asp-for="Input.ExpiresAt" type="datetime-local" class="form-control" style="max-width:280px" />
+                        <div class="form-text">Leave blank for no expiry.</div>
+                    </div>
+
+                    @* Requires Acknowledgement *@
+                    <div class="mb-4">
+                        <div class="form-check">
+                            <input asp-for="Input.RequiresAcknowledgement" class="form-check-input" type="checkbox" />
+                            <label asp-for="Input.RequiresAcknowledgement" class="form-check-label fw-semibold">
+                                Require read acknowledgement
+                            </label>
+                        </div>
+                        <div class="form-text">Recipients must click "Acknowledge" — recorded in audit log.</div>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="bi bi-send-fill me-2"></i>Post Announcement
+                        </button>
+                        <a asp-page="/Announcements/Index" class="btn btn-outline-secondary">Cancel</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+<partial name="_ValidationScriptsPartial" />
+<script>
+    const categoryHints = {
+        0: "Rally schedules, padyatra routes, event timings. Auto-expires after the event.",
+        1: "?? Booth incidents, EVM issues, urgent alerts. Will be PINNED at top of all dashboards.",
+        2: "EC rules, expense limits, model code updates. Recipients must acknowledge — logged in audit.",
+        3: "Morning briefings with voter contact targets and sector instructions.",
+        4: "Candidate's personal motivational message or milestone celebration.",
+        5: "Auto-triggered data nudge based on campaign metrics."
+    };
+
+    function updateCategoryHints() {
+        const selected = document.querySelector('input[name="Input.Category"]:checked');
+        const hint = document.getElementById('categoryHint');
+        if (selected) hint.textContent = categoryHints[selected.value] || '';
+        // Auto-check requires-ack for EC Compliance (category 2)
+        const ackBox = document.getElementById('Input_RequiresAcknowledgement');
+        if (selected && selected.value === '2') {
+            ackBox.checked = true;
+        }
+    }
+
+    function toggleAllRoles(cb) {
+        document.querySelectorAll('.role-check').forEach(c => c.disabled = cb.checked);
+        if (cb.checked) document.querySelectorAll('.role-check').forEach(c => c.checked = false);
+    }
+
+    // Init hint on load
+    updateCategoryHints();
+</script>
+}

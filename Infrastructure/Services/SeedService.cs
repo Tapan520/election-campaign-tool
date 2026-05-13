@@ -292,7 +292,208 @@ public static class SeedService
                 RespondedAt = DateTime.UtcNow.AddDays(-4 + i)
             }).ToList();
 
-            db.Surveys.AddRange(survey1, survey2, survey3);
+        db.Surveys.AddRange(survey1, survey2, survey3);
+            await db.SaveChangesAsync();
+        }
+
+        // ?? Announcements (seed test data) ??????????????????????????????????????
+        if (!db.Announcements.Any())
+        {
+            var constituency = db.Constituencies.First();
+            var adminUser   = await userManager.FindByEmailAsync("admin@election.com");
+            var managerUser = await userManager.FindByEmailAsync("manager@election.com");
+            var workerUser  = await userManager.FindByEmailAsync("worker@election.com");
+            var now         = DateTime.UtcNow;
+
+            db.Announcements.AddRange(
+
+                // 1. CRITICAL ALERT — pinned, no expiry, requires ack
+                new Announcement
+                {
+                    Title                  = "⚠️ EVM Malfunction Reported at Booth 3",
+                    Body                   = "A technical issue has been reported with the EVM unit at Booth 3 (Shivaji Park). All booth agents and field workers in Ward 3 must halt operations and await instructions from the returning officer. Do NOT allow any voting till further notice.",
+                    Category               = AnnouncementCategory.CriticalAlert,
+                    CreatedByUserId        = managerUser?.Id ?? "system",
+                    CreatedByName          = managerUser?.FullName ?? "Campaign Manager",
+                    ConstituencyId         = constituency.Id,
+                    TargetRoles            = "All",
+                    IsPinned               = true,
+                    RequiresAcknowledgement = true,
+                    IsActive               = true,
+                    CreatedAt              = now.AddHours(-2)
+                },
+
+                // 2. EC COMPLIANCE NOTICE — requires ack, targeted at manager + candidate
+                new Announcement
+                {
+                    Title                  = "EC Expense Cap Updated — ₹40 Lakh Limit Effective Immediately",
+                    Body                   = "The Election Commission has revised the election expenditure ceiling for MLA constituencies to ₹40,00,000. All campaign expenses from today onwards must be within this limit. Each expense entry must be documented with receipts. Non-compliance will lead to disqualification.\n\nPlease acknowledge this notice to confirm you have read and understood the new limit.",
+                    Category               = AnnouncementCategory.ECComplianceNotice,
+                    CreatedByUserId        = adminUser?.Id ?? "system",
+                    CreatedByName          = adminUser?.FullName ?? "System Administrator",
+                    ConstituencyId         = constituency.Id,
+                    TargetRoles            = "CampaignManager,Candidate",
+                    IsPinned               = false,
+                    RequiresAcknowledgement = true,
+                    IsActive               = true,
+                    CreatedAt              = now.AddDays(-1)
+                },
+
+                // 3. CAMPAIGN ANNOUNCEMENT — all roles, expires after rally
+                new Announcement
+                {
+                    Title                  = "Patel Wadi Mega Rally — Final Schedule Confirmed",
+                    Body                   = "The grand public rally at Patel Wadi Sports Ground (Ward 7) is confirmed for this Saturday at 4:00 PM.\n\n📍 Venue: Patel Wadi Sports Ground, Ward 7\n🕓 Time: 4:00 PM sharp\n🚌 Volunteer transport leaves from Campaign Office at 3:15 PM\n\nAll field workers and booth agents must report by 3:30 PM for crowd management duties. Wear your campaign vests.",
+                    Category               = AnnouncementCategory.CampaignAnnouncement,
+                    CreatedByUserId        = managerUser?.Id ?? "system",
+                    CreatedByName          = managerUser?.FullName ?? "Campaign Manager",
+                    ConstituencyId         = constituency.Id,
+                    TargetRoles            = "All",
+                    IsPinned               = false,
+                    RequiresAcknowledgement = false,
+                    IsActive               = true,
+                    ExpiresAt              = now.AddDays(6),
+                    CreatedAt              = now.AddDays(-2)
+                },
+
+                // 4. DAILY BRIEFING — field workers + booth agents
+                new Announcement
+                {
+                    Title                  = "Morning Briefing — Today's Voter Contact Targets",
+                    Body                   = "Good morning team! Here are today's targets:\n\n🎯 Ward 5 (Tilak Nagar): 120 voter contacts\n🎯 Ward 6 (Subhash Chowk): 95 voter contacts\n🎯 Ward 7 (Patel Wadi): 85 voter contacts\n\nPriority pannas: 3A, 3B, and 4C in Ward 5. Focus on undecided and floating voters. Update sentiments in the app after each visit.\n\nDaily call at 6:00 PM on WhatsApp group for status update.",
+                    Category               = AnnouncementCategory.DailyBriefing,
+                    CreatedByUserId        = managerUser?.Id ?? "system",
+                    CreatedByName          = managerUser?.FullName ?? "Campaign Manager",
+                    ConstituencyId         = constituency.Id,
+                    TargetRoles            = "FieldWorker,BoothAgent",
+                    IsPinned               = false,
+                    RequiresAcknowledgement = false,
+                    IsActive               = true,
+                    ExpiresAt              = now.AddHours(20),
+                    CreatedAt              = now.AddHours(-6)
+                },
+
+                // 5. MOTIVATION — all roles, from candidate
+                new Announcement
+                {
+                    Title                  = "🏆 We Just Crossed 1,000 Favour Contacts — Thank You!",
+                    Body                   = "Dear Team,\n\nI am proud to share that as of this morning, we have successfully contacted and marked over 1,000 voters as 'In Favour' — a milestone that reflects every visit, every call, and every conversation you have had.\n\nYour dedication is what makes this campaign strong. Keep going — election day is near and every single contact counts.\n\nWith gratitude,\nDemo Candidate",
+                    Category               = AnnouncementCategory.Motivation,
+                    CreatedByUserId        = adminUser?.Id ?? "system",
+                    CreatedByName          = "Demo Candidate",
+                    ConstituencyId         = constituency.Id,
+                    TargetRoles            = "All",
+                    IsPinned               = false,
+                    RequiresAcknowledgement = false,
+                    IsActive               = true,
+                    CreatedAt              = now.AddDays(-3)
+                },
+
+                // 6. LIVE DATA NUDGE — auto-generated, all roles
+                new Announcement
+                {
+                    Title                  = "📊 Booth 7 Coverage Dropped Below 30% — Needs Attention",
+                    Body                   = "Platform alert: Booth 7 (Patel Wadi) voter contact coverage has dropped to 27% — below the 30% threshold.\n\nOnly 113 of 420 registered voters have been contacted so far. This booth is at risk of low turnout. Please prioritise door-to-door outreach in this area today.\n\nContact the assigned booth agent (Rahul Borse, 9876500007) to coordinate.",
+                    Category               = AnnouncementCategory.LiveDataNudge,
+                    CreatedByUserId        = adminUser?.Id ?? "system",
+                    CreatedByName          = "System (Auto)",
+                    ConstituencyId         = constituency.Id,
+                    TargetRoles            = "CampaignManager,FieldWorker",
+                    IsPinned               = false,
+                    RequiresAcknowledgement = false,
+                    IsActive               = true,
+                    CreatedAt              = now.AddHours(-1)
+                },
+
+                // 7. CAMPAIGN ANNOUNCEMENT — past, expired
+                new Announcement
+                {
+                    Title                  = "Gandhi Nagar Padyatra — Route & Timing",
+                    Body                   = "The padyatra through Gandhi Nagar (Ward 1) lanes has been confirmed.\n\n📍 Start: Gandhi Nagar Chowk\n🕙 Time: 7:00 AM\n🗺️ Route: Gandhi Nagar → Subhash Lane → Back to Chowk\n\nAll volunteers for Ward 1 must report at 6:45 AM. Wear campaign colours.",
+                    Category               = AnnouncementCategory.CampaignAnnouncement,
+                    CreatedByUserId        = managerUser?.Id ?? "system",
+                    CreatedByName          = managerUser?.FullName ?? "Campaign Manager",
+                    ConstituencyId         = constituency.Id,
+                    TargetRoles            = "FieldWorker,BoothAgent",
+                    IsPinned               = false,
+                    RequiresAcknowledgement = false,
+                    IsActive               = true,
+                    ExpiresAt              = now.AddDays(-18),   // already expired
+                    CreatedAt              = now.AddDays(-22)
+                },
+
+                // 8. EC COMPLIANCE — model code reminder, active
+                new Announcement
+                {
+                    Title                  = "Model Code of Conduct — Restricted Activity Window Begins Tonight",
+                    Body                   = "As per the latest EC directive, the silent period begins tonight at midnight (00:00 hrs). The following activities are PROHIBITED during this window:\n\n❌ Public rallies or processions\n❌ Loudspeaker use in residential areas\n❌ Distribution of any material\n❌ Canvassing within 200m of a polling station\n\nViolations will be reported directly to the Returning Officer. All team members must comply strictly.",
+                    Category               = AnnouncementCategory.ECComplianceNotice,
+                    CreatedByUserId        = adminUser?.Id ?? "system",
+                    CreatedByName          = adminUser?.FullName ?? "System Administrator",
+                    ConstituencyId         = constituency.Id,
+                    TargetRoles            = "All",
+                    IsPinned               = false,
+                    RequiresAcknowledgement = true,
+                    IsActive               = true,
+                    CreatedAt              = now.AddDays(-4)
+                }
+            );
+            await db.SaveChangesAsync();
+        }
+
+        // ?? Audit Logs (seed representative history) ????????????????????????????????????
+        if (!db.AuditLogs.Any())
+        {
+            var now = DateTime.UtcNow;
+            var adminUser  = await userManager.FindByEmailAsync("admin@election.com");
+            var managerUser = await userManager.FindByEmailAsync("manager@election.com");
+            var workerUser  = await userManager.FindByEmailAsync("worker@election.com");
+
+            var logs = new List<AuditLog>();
+            void Add(AppUser? u, string action, string entity, string? entityId, string details, int daysAgo, int? cId = null) =>
+                logs.Add(new AuditLog
+                {
+                    UserId       = u?.Id ?? "system",
+                    UserName     = u?.FullName ?? "System",
+                    Action       = action,
+                    EntityType   = entity,
+                    EntityId     = entityId,
+                    Details      = details,
+                    ConstituencyId = cId ?? u?.ConstituencyId,
+                    IpAddress    = "127.0.0.1",
+                    CreatedAt    = now.AddDays(-daysAgo).AddHours(-new Random(daysAgo).Next(0, 23))
+                });
+
+            Add(adminUser,   "Login",            "Session",    null, "Admin logged in",                                                   30);
+            Add(adminUser,   "CreateUser",        "AppUser",    null, "Created user: Campaign Manager (manager@election.com)",             29);
+            Add(adminUser,   "CreateUser",        "AppUser",    null, "Created user: Field Worker 1 (worker@election.com)",                29);
+            Add(managerUser, "Login",             "Session",    null, "Manager logged in",                                                28);
+            Add(workerUser,  "Login",             "Session",    null, "Field Worker logged in",                                           27);
+            Add(managerUser, "PostAnnouncement",  "Announcement", null, "[Campaign] 'Ward 3 Padyatra Schedule' → FieldWorker,BoothAgent", 25);
+            Add(workerUser,  "LogVisit",          "Voter",      "12", "Visit logged for Rajesh Kumar (MH010012): Visited, sentiment=Favour", 24);
+            Add(workerUser,  "UpdateSentiment",   "Voter",      "5",  "Sentiment changed from Unknown to Favour for Sanjay Gupta (MH010005)", 23);
+            Add(adminUser,   "Login",             "Session",    null, "Admin logged in",                                                   22);
+            Add(managerUser, "LogVisit",          "Voter",      "18", "Visit logged for Priya Singh (MH010018): Visited, sentiment=Favour", 20);
+            Add(workerUser,  "UpdateSentiment",   "Voter",      "22", "Sentiment changed from Neutral to Floating for Meena Joshi (MH020002)", 18);
+            Add(managerUser, "PostAnnouncement",  "Announcement", null, "[CriticalAlert] 'EVM Test at Booth 3 — Stand By' → All",         17);
+            Add(workerUser,  "Login",             "Session",    null, "Field Worker logged in",                                           16);
+            Add(workerUser,  "LogVisit",          "Voter",      "34", "Visit logged for Amit Patel (MH020014): NotAtHome, sentiment=Unknown", 15);
+            Add(managerUser, "Login",             "Session",    null, "Manager logged in",                                                14);
+            Add(adminUser,   "EnableUser",        "AppUser",    null, "User 'Field Worker 1' enabled",                                    13);
+            Add(managerUser, "PostAnnouncement",  "Announcement", null, "[DailyBriefing] 'Morning targets — Ward 5 & 6' → FieldWorker,BoothAgent", 12);
+            Add(workerUser,  "UpdateSentiment",   "Voter",      "9",  "Sentiment changed from Against to Neutral for Kavitha Nair (MH010009)", 10);
+            Add(workerUser,  "LogVisit",          "Voter",      "41", "Visit logged for Sunita Sharma (MH030001): Visited, sentiment=Favour", 9);
+            Add(managerUser, "LogVisit",          "Voter",      "55", "Visit logged for Vijay Rao (MH030015): Refused, sentiment=Against", 8);
+            Add(adminUser,   "Login",             "Session",    null, "Admin logged in",                                                    7);
+            Add(adminUser,   "PostAnnouncement",  "Announcement", null, "[ECComplianceNotice] 'EC Expense Limit Reminder' → All",           6);
+            Add(workerUser,  "UpdateSentiment",   "Voter",      "3",  "Sentiment changed from Floating to Favour for Dinesh Patil (MH010003)", 5);
+            Add(managerUser, "Login",             "Session",    null, "Manager logged in",                                                    4);
+            Add(workerUser,  "LogVisit",          "Voter",      "27", "Visit logged for Anita More (MH020007): Visited, sentiment=Favour",   3);
+            Add(managerUser, "PostAnnouncement",  "Announcement", null, "[Motivation] 'We crossed 800 favour contacts!' → All",              2);
+            Add(workerUser,  "Login",             "Session",    null, "Field Worker logged in",                                               1);
+            Add(workerUser,  "UpdateSentiment",   "Voter",      "47", "Sentiment changed from Unknown to Favour for Rajesh Kumar (MH030007)", 0);
+
+            db.AuditLogs.AddRange(logs);
             await db.SaveChangesAsync();
         }
     }

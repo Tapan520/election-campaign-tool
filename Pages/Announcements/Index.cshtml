@@ -1,0 +1,175 @@
+@page
+@using Nirvachak_AI.Domain.Enums
+@model Nirvachak_AI.Pages.Announcements.IndexModel
+@{
+    ViewData["Title"] = "Announcements";
+    var categories = Enum.GetValues<AnnouncementCategory>();
+}
+
+@if (TempData["Message"] != null)
+{
+    <div class="alert alert-success alert-dismissible fade show py-2" role="alert">
+        <i class="bi bi-check-circle me-2"></i>@TempData["Message"]
+        <button type="button" class="btn-close py-2" data-bs-dismiss="alert"></button>
+    </div>
+}
+
+@* Pinned Critical Alerts *@
+@if (Model.PinnedAlerts.Any())
+{
+    <div class="mb-4">
+        @foreach (var vm in Model.PinnedAlerts)
+        {
+            <div class="alert alert-danger border-danger border-2 d-flex align-items-start gap-3 mb-2 shadow-sm" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-4 mt-1 flex-shrink-0"></i>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-2 mb-1 flex-wrap">
+                        <strong class="fs-6">@vm.Announcement.Title</strong>
+                        <span class="badge bg-danger">PINNED</span>
+                        @if (vm.Announcement.RequiresAcknowledgement && !vm.IsAcknowledged)
+                        {
+                            <span class="badge bg-warning text-dark"><i class="bi bi-exclamation-circle me-1"></i>Acknowledgement Required</span>
+                        }
+                        @if (vm.IsAcknowledged)
+                        {
+                            <span class="badge bg-success"><i class="bi bi-check2 me-1"></i>Acknowledged</span>
+                        }
+                    </div>
+                    <p class="mb-1">@vm.Announcement.Body</p>
+                    <div class="d-flex align-items-center gap-3 flex-wrap mt-2">
+                        <small class="text-muted"><i class="bi bi-person me-1"></i>@vm.Announcement.CreatedByName</small>
+                        <small class="text-muted"><i class="bi bi-clock me-1"></i>@vm.Announcement.CreatedAt.ToLocalTime().ToString("dd MMM, h:mm tt")</small>
+                        @if (vm.Announcement.RequiresAcknowledgement && !vm.IsAcknowledged)
+                        {
+                            <form method="post" asp-page-handler="Acknowledge" asp-route-id="@vm.Announcement.Id" class="d-inline">
+                                <button class="btn btn-sm btn-danger">
+                                    <i class="bi bi-check2-all me-1"></i>Acknowledge
+                                </button>
+                            </form>
+                        }
+                        @if (vm.Announcement.RequiresAcknowledgement)
+                        {
+                            <small class="text-muted"><i class="bi bi-check2-square me-1"></i>@vm.AcknowledgementCount acknowledged</small>
+                        }
+                        @if (Model.CurrentUserRole == UserRole.Admin || vm.Announcement.CreatedByUserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                        {
+                            <form method="post" asp-page-handler="Deactivate" asp-route-id="@vm.Announcement.Id" class="d-inline ms-auto">
+                                <button class="btn btn-sm btn-outline-secondary py-0" onclick="return confirm('Remove this announcement?')">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </form>
+                        }
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}
+
+@* Toolbar *@
+<div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+    <div class="d-flex gap-2 align-items-center flex-wrap">
+        <a asp-page="/Announcements/Index" class="btn btn-sm @(string.IsNullOrEmpty(Model.Category) ? "btn-primary" : "btn-outline-secondary")">All</a>
+        @foreach (var cat in categories)
+        {
+            var vm0 = new Nirvachak_AI.Domain.Entities.Announcement { Category = cat };
+            <a asp-page="/Announcements/Index" asp-route-Category="@cat.ToString()"
+               class="btn btn-sm @(Model.Category == cat.ToString() ? $"btn-{vm0.CategoryColor}" : "btn-outline-secondary")">
+                <i class="bi @vm0.CategoryIcon me-1"></i>@vm0.CategoryLabel
+            </a>
+        }
+    </div>
+    @if (Model.CanCreate)
+    {
+        <a asp-page="/Announcements/Create" class="btn btn-primary btn-sm">
+            <i class="bi bi-plus-lg me-1"></i>New Announcement
+        </a>
+    }
+</div>
+
+@* Main feed *@
+@if (!Model.Announcements.Any() && !Model.PinnedAlerts.Any())
+{
+    <div class="card">
+        <div class="card-body text-center py-5 text-muted">
+            <i class="bi bi-megaphone fs-1 d-block mb-3 opacity-25"></i>
+            <div class="fw-semibold">No announcements right now</div>
+            <small>Check back later or post a new announcement.</small>
+        </div>
+    </div>
+}
+else
+{
+    <div class="d-flex flex-column gap-3">
+        @foreach (var vm in Model.Announcements)
+        {
+            var a = vm.Announcement;
+            var needsAck = a.RequiresAcknowledgement && !vm.IsAcknowledged;
+            <div class="card @(needsAck ? "border-warning border-2" : "") shadow-sm">
+                <div class="card-body">
+                    <div class="d-flex align-items-start gap-3">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0"
+                             style="width:44px;height:44px;background:var(--bs-@(a.CategoryColor)-bg-subtle,#f8f9fa);">
+                            <i class="bi @a.CategoryIcon text-@a.CategoryColor fs-5"></i>
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-center gap-2 flex-wrap mb-1">
+                                <span class="badge bg-@a.CategoryColor">@a.CategoryLabel</span>
+                                @if (needsAck)
+                                {
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-bell-fill me-1"></i>Action Required</span>
+                                }
+                                @if (vm.IsAcknowledged)
+                                {
+                                    <span class="badge bg-success-subtle text-success border border-success-subtle">
+                                        <i class="bi bi-check2 me-1"></i>Acknowledged
+                                    </span>
+                                }
+                                @if (a.ExpiresAt.HasValue)
+                                {
+                                    <span class="badge bg-light text-muted border">
+                                        <i class="bi bi-clock me-1"></i>Expires @a.ExpiresAt.Value.ToLocalTime().ToString("dd MMM")
+                                    </span>
+                                }
+                            </div>
+                            <h6 class="fw-bold mb-1">@a.Title</h6>
+                            <p class="text-muted mb-2" style="white-space:pre-wrap;">@a.Body</p>
+                            <div class="d-flex align-items-center gap-3 flex-wrap text-muted" style="font-size:0.8rem;">
+                                <span><i class="bi bi-person me-1"></i>@a.CreatedByName</span>
+                                <span><i class="bi bi-clock me-1"></i>@a.CreatedAt.ToLocalTime().ToString("dd MMM yyyy, h:mm tt")</span>
+                                @if (!string.IsNullOrEmpty(a.TargetRoles) && a.TargetRoles != "All")
+                                {
+                                    <span><i class="bi bi-people me-1"></i>@string.Join(", ", a.TargetRoles.Split(','))</span>
+                                }
+                                else
+                                {
+                                    <span><i class="bi bi-people me-1"></i>All roles</span>
+                                }
+                                @if (a.RequiresAcknowledgement)
+                                {
+                                    <span><i class="bi bi-check2-square me-1"></i>@vm.AcknowledgementCount acknowledged</span>
+                                }
+                                @if (a.RequiresAcknowledgement && !vm.IsAcknowledged)
+                                {
+                                    <form method="post" asp-page-handler="Acknowledge" asp-route-id="@a.Id" class="d-inline ms-auto">
+                                        <button class="btn btn-sm btn-warning">
+                                            <i class="bi bi-check2-all me-1"></i>Acknowledge & Confirm
+                                        </button>
+                                    </form>
+                                }
+                                @if (Model.CurrentUserRole == UserRole.Admin || a.CreatedByUserId == User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value)
+                                {
+                                    <form method="post" asp-page-handler="Deactivate" asp-route-id="@a.Id" class="d-inline @(a.RequiresAcknowledgement && !vm.IsAcknowledged ? "" : "ms-auto")">
+                                        <button class="btn btn-sm btn-outline-secondary py-0" onclick="return confirm('Remove this announcement?')">
+                                            <i class="bi bi-trash me-1"></i>Remove
+                                        </button>
+                                    </form>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

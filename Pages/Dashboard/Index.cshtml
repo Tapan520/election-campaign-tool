@@ -107,6 +107,36 @@ else if (!string.IsNullOrEmpty(Model.ActiveConstituencyName))
 }
 
 <!-- Stats Row -->
+@if (Model.CriticalAlerts.Any())
+{
+    <div class="mb-3">
+        @foreach (var vm in Model.CriticalAlerts)
+        {
+            <div class="alert alert-danger border-danger border-2 d-flex align-items-start gap-3 mb-2 shadow-sm py-2" role="alert">
+                <i class="bi bi-exclamation-triangle-fill fs-5 mt-1 flex-shrink-0 text-danger"></i>
+                <div class="flex-grow-1">
+                    <div class="d-flex align-items-center gap-2 flex-wrap">
+                        <span class="badge bg-danger">CRITICAL ALERT</span>
+                        <strong>@vm.Announcement.Title</strong>
+                        <small class="text-muted ms-2">@vm.Announcement.CreatedByName &middot; @vm.Announcement.CreatedAt.ToLocalTime().ToString("dd MMM, h:mm tt")</small>
+                        <a asp-page="/Announcements/Index" class="btn btn-sm btn-outline-danger py-0 ms-auto">View All</a>
+                    </div>
+                    <div class="small mt-1">@vm.Announcement.Body</div>
+                </div>
+            </div>
+        }
+    </div>
+}
+@if (Model.UnacknowledgedCount > 0)
+{
+    <div class="alert alert-warning d-flex align-items-center gap-2 py-2 mb-3">
+        <i class="bi bi-bell-fill text-warning"></i>
+        <span>You have <strong>@Model.UnacknowledgedCount</strong> announcement@(Model.UnacknowledgedCount > 1 ? "s" : "") requiring acknowledgement.</span>
+        <a asp-page="/Announcements/Index" class="btn btn-sm btn-warning ms-auto">Review</a>
+    </div>
+}
+
+<!-- Stats Row -->
 <div class="row g-3 mb-4">
     <div class="col-6 col-md-3">
         <div class="card stat-card h-100">
@@ -280,6 +310,51 @@ else if (!string.IsNullOrEmpty(Model.ActiveConstituencyName))
                         <div class="small text-muted">EC Compliant</div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-3 mt-1">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-megaphone-fill me-2 text-primary"></i>Recent Announcements</span>
+                <a asp-page="/Announcements/Index" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                @if (!Model.RecentAnnouncements.Any())
+                {
+                    <div class="text-center text-muted py-3 small">No announcements yet.</div>
+                }
+                @foreach (var vm in Model.RecentAnnouncements)
+                {
+                    var a = vm.Announcement;
+                    <div class="d-flex align-items-start gap-3 px-3 py-2 border-bottom">
+                        <div class="rounded-circle d-flex align-items-center justify-content-center flex-shrink-0 mt-1"
+                             style="width:34px;height:34px;background:var(--bs-body-bg);border:1px solid var(--bs-border-color);">
+                            <i class="bi @a.CategoryIcon text-@a.CategoryColor"></i>
+                        </div>
+                        <div class="flex-grow-1 min-w-0">
+                            <div class="d-flex align-items-center gap-2 flex-wrap">
+                                <span class="badge bg-@a.CategoryColor">@a.CategoryLabel</span>
+                                <span class="fw-semibold small">@a.Title</span>
+                                @if (a.RequiresAcknowledgement && !vm.IsAcknowledged)
+                                {
+                                    <span class="badge bg-warning text-dark"><i class="bi bi-bell-fill me-1"></i>Action needed</span>
+                                }
+                            </div>
+                            <div class="text-muted" style="font-size:0.75rem;">
+                                @a.CreatedByName &middot; @a.CreatedAt.ToLocalTime().ToString("dd MMM, h:mm tt")
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+            <div class="card-footer text-end">
+                <a asp-page="/Announcements/Create" class="btn btn-sm btn-primary">
+                    <i class="bi bi-plus-lg me-1"></i>Post Announcement
+                </a>
             </div>
         </div>
     </div>
