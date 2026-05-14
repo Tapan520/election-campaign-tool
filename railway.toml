@@ -6,3 +6,8 @@ healthcheckPath = "/Account/Login"
 healthcheckTimeout = 60
 restartPolicyType = "on_failure"
 restartPolicyMaxRetries = 3
+
+# Environment variables injected at runtime
+# DATABASE_PATH=/data/election.db  ? set this in Railway dashboard ? Variables
+# Railway Volume must be mounted at /data in the Railway dashboard ? Volumes
+

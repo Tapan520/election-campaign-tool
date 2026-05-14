@@ -13,9 +13,20 @@ using Nirvachak_AI.Infrastructure.Services;
 var builder = WebApplication.CreateBuilder(args);
 
 // ?? Database ??????????????????????????????????????????????????
+// On Railway: set DATABASE_PATH=/data/election.db  (volume mounted at /data)
+// Locally:    defaults to election.db in working directory
+var dbPath = Environment.GetEnvironmentVariable("DATABASE_PATH")
+    ?? builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? "Data Source=election.db";
+
+// Ensure the directory exists (important for Railway volume path /data/)
+var dbFile = dbPath.Replace("Data Source=", "").Trim();
+var dbDir  = Path.GetDirectoryName(dbFile);
+if (!string.IsNullOrEmpty(dbDir) && !Directory.Exists(dbDir))
+    Directory.CreateDirectory(dbDir);
+
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")
-        ?? "Data Source=election.db"));
+    options.UseSqlite(dbPath.StartsWith("Data Source=") ? dbPath : $"Data Source={dbPath}"));
 
 // ?? Identity ??????????????????????????????????????????????????
 builder.Services.AddIdentity<AppUser, IdentityRole>(options =>

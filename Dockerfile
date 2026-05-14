@@ -16,9 +16,15 @@ WORKDIR /app
 
 COPY --from=build /app/publish .
 
-# Railway injects $PORT at runtime — bind to it
+# Create /data directory — Railway Volume will be mounted here.
+# If no volume is attached, the DB falls back to /data/election.db inside the container
+# (data won't persist across redeploys without the Volume — see Railway dashboard).
+RUN mkdir -p /data
+
 ENV ASPNETCORE_ENVIRONMENT=Production
-ENV ASPNETCORE_URLS=http://+:${PORT:-8080}
+# DATABASE_PATH tells the app where to store the SQLite file.
+# Set this to /data/election.db in Railway ? Variables, and mount a Volume at /data.
+ENV DATABASE_PATH=/data/election.db
 
 # Use sh so $PORT is evaluated at container start time
 ENTRYPOINT ["sh", "-c", "ASPNETCORE_URLS=http://+:${PORT:-8080} dotnet Nirvachak_AI.dll"]
